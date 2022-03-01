@@ -1,0 +1,21 @@
+name: Frends.Exchange.ReadMail Main
+
+on:
+  push:
+    branches:    
+      - main
+    paths:
+      - 'Frends.Exchange.ReadMail/**'
+  workflow_dispatch:
+  
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
+    with:
+      env_var_name_1: EXCHANGE_SETTINGS_FOR_TESTING
+      workdir: Frends.Exchange
+    secrets:
+      env_var_value_1: ${{ secrets.EXCHANGE_SETTINGS_FOR_TESTING }}
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      
