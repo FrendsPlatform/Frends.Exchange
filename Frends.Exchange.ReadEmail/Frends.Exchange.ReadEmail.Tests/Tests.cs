@@ -10,6 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using Newtonsoft.Json;
 
 namespace Frends.Exchange.ReadEmail.Tests
 {
@@ -18,7 +20,26 @@ namespace Frends.Exchange.ReadEmail.Tests
         private const string serverAddressInCorrectFormat = "https://servername/ews/exchange.amsx";
         private const string serverAddressAsFaulty = "ksdfjdosifsfsdsc/exchange.asddd";
         private const string expectedDummyTextFileContent = "This is a dummy file.";
+        private const string settingsEnvVarName = "EXCHANGE_SETTINGS_FOR_TESTING";
 
+        public static ExchangeSettings GetSettingsFromEnvironment()
+        {
+            var rawJson = Environment.GetEnvironmentVariable(settingsEnvVarName);
+            if (!string.IsNullOrEmpty(rawJson))
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<ExchangeSettings>(rawJson);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Couldn't deserialize the environment variable \"{settingsEnvVarName}\". Ensure it is correct format. See inner exception.", ex);
+                }
+            } else
+            {
+                throw new InvalidOperationException($"Couldn't get Exchange settings for testing. Ensure the environment variable \"{settingsEnvVarName}\" is set.");
+            }
+        }
 
         [Test]
         public void ConnectToExchangeServiceRejectsFaultyServerAddress()
@@ -35,7 +56,7 @@ namespace Frends.Exchange.ReadEmail.Tests
         }
 
         [Test]
-        public void ConnectToExchangeService()
+        public void ConnectToExchangeServiceMethodSetsCorrectExchangeVersion()
         {
             TestSettingExchangeServerVersion(ExchangeServerVersion.Exchange2007_SP1, ExchangeVersion.Exchange2007_SP1);
             TestSettingExchangeServerVersion(ExchangeServerVersion.Exchange2010, ExchangeVersion.Exchange2010);
@@ -45,9 +66,6 @@ namespace Frends.Exchange.ReadEmail.Tests
             TestSettingExchangeServerVersion(ExchangeServerVersion.Office365, ExchangeVersion.Exchange2013_SP1);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [Test]
         public void ConnectToExchangeServiceSetsExpectedValidationCallbackMethod()
         {
@@ -188,10 +206,54 @@ namespace Frends.Exchange.ReadEmail.Tests
             Assert.IsTrue((bool)result!);
         }
 
-        [Test]
-        public void ExchangeCertificateValidationCallbackIsSetCorrectly()
+        private static EmailMessage SendTestEmail(ExchangeSettings settings)
         {
+            var tempDirPath = Path.Combine(Path.GetTempPath(), "emailsendtest");
+            Directory.CreateDirectory(tempDirPath);
 
+            var service = Util.ConnectToExchangeService(settings);
+            var msgAndFiles = CreateEmailMessageWithAttachments(tempDirPath, service);
+
+            msgAndFiles.Item1.Subject = $"Test email {Guid.NewGuid()}";
+            msgAndFiles.Item1.Body = "Hello there! This is a test email, for testing purposes.";
+            msgAndFiles.Item1.ToRecipients.Add(settings.Username);
+
+            var sendTask = msgAndFiles.Item1.Send();
+            sendTask.Wait(5000);
+
+            Directory.Delete(tempDirPath, true);
+
+            return msgAndFiles.Item1;
+        }
+
+        [Test]
+        public static void TestReadingMails()
+        {
+            var settings = GetSettingsFromEnvironment();
+            var options = new ExchangeOptions()
+            {
+                AttachmentSaveDirectory = Path.Combine(Path.GetTempPath(), "reademailtest"),
+                MaxEmails = 500
+            };
+
+            var sentEmail = SendTestEmail(settings);
+            
+            Thread.Sleep(5000);
+
+            var readTask = Exchange.ReadEmail(settings, options);
+            readTask.Wait(10000);
+            var result = readTask.Result;
+
+            EmailMessageResult? receivedEmail = result.Where(msg => msg.Subject == sentEmail.Subject).FirstOrDefault();
+
+            Assert.IsNotNull(receivedEmail);
+
+            RemoveEmailMessage(Util.ConnectToExchangeService(settings), receivedEmail!.Id);
+        }
+
+        public static void RemoveEmailMessage(ExchangeService service, string msgId)
+        {
+            var response = service.DeleteItems(new[] { new ItemId(msgId) }, DeleteMode.HardDelete, null, null);
         }
     }
 }

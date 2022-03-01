@@ -32,6 +32,11 @@ public static class Exchange
                 throw new DirectoryNotFoundException($"Could not find or access attachment save directory {options.AttachmentSaveDirectory}");
             }
         }
+        if (options.MaxEmails <= 0)
+        {
+            throw new ArgumentException("MaxEmails can't be lower than 1.");
+        }
+
 
         // Connect, create view and search filter
         ExchangeService exchangeService = Util.ConnectToExchangeService(settings);
