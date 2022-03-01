@@ -1,15 +1,11 @@
 using NUnit.Framework;
-using Frends.Exchange.ReadEmail;
 using System;
 using Microsoft.Exchange.WebServices.Data;
 using Frends.Exchange.ReadEmail.Definitions;
 using System.Net.Security;
-using System.Reflection;
-using Moq;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using Newtonsoft.Json;
 
