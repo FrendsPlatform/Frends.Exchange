@@ -8,6 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace Frends.Exchange.ReadEmail.Tests
 {
@@ -20,20 +21,34 @@ namespace Frends.Exchange.ReadEmail.Tests
 
         public static ExchangeSettings GetSettingsFromEnvironment()
         {
-            var rawJson = Environment.GetEnvironmentVariable(settingsEnvVarName);
-            if (!string.IsNullOrEmpty(rawJson))
+            var base64str = Environment.GetEnvironmentVariable(settingsEnvVarName);
+            if (string.IsNullOrEmpty(base64str))
             {
-                try
-                {
-                    return JsonConvert.DeserializeObject<ExchangeSettings>(rawJson);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Couldn't deserialize the environment variable \"{settingsEnvVarName}\". Ensure it is correct format. See inner exception.", ex);
-                }
-            } else
+                throw new InvalidOperationException(
+                    $"The environment variable \"{settingsEnvVarName}\" appears to be empty. This could be because it either is really empty, or the variable doesn't exist.");
+            }
+
+            string json = "";
+            try
             {
-                throw new InvalidOperationException($"Couldn't get Exchange settings for testing. Ensure the environment variable \"{settingsEnvVarName}\" is set.");
+                json = Encoding.UTF8.GetString(Convert.FromBase64String(base64str));
+            }
+            catch (FormatException formatEx)
+            {
+                throw new Exception($"Couldn't decode environment variable \"{settingsEnvVarName}\" from base64. It might be because it isn't base64-encoded properly.", formatEx);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Couldn't decode environment variable \"{settingsEnvVarName}\" from base64.", ex);
+            }
+
+            try
+            {
+                return JsonConvert.DeserializeObject<ExchangeSettings>(json);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Couldn't deserialize the environment variable \"{settingsEnvVarName}\". Ensure it's in correct format.", ex);
             }
         }
 
