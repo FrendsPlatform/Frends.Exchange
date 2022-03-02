@@ -246,6 +246,7 @@ namespace Frends.Exchange.ReadEmail.Tests
                 AttachmentSaveDirectory = Path.Combine(Path.GetTempPath(), "reademailtest"),
                 MaxEmails = 500
             };
+            Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "reademailtest"));
 
             var sentEmail = SendTestEmail(settings);
             

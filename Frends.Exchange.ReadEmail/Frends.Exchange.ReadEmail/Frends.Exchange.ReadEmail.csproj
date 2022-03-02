@@ -10,7 +10,7 @@
 		<PackageTags>Frends</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<Description>Reads email via Microsoft Exchange.</Description>
+		<Description>Reads emails via Exchange.</Description>
 		<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/FrendsPlatform/Frends.Exchange</RepositoryUrl>
     </PropertyGroup>
