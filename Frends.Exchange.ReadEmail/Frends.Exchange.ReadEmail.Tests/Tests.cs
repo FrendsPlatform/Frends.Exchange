@@ -62,7 +62,7 @@ namespace Frends.Exchange.ReadEmail.Tests
             
             Assert.Throws(typeof(UriFormatException), () => 
             { 
-                Util.ConnectToExchangeService(settings); 
+                Exchange.ConnectToExchangeService(settings); 
             });
         }
 
@@ -80,7 +80,7 @@ namespace Frends.Exchange.ReadEmail.Tests
         [Test]
         public void ConnectToExchangeServiceSetsExpectedValidationCallbackMethod()
         {
-            Util.ConnectToExchangeService(new ExchangeSettings()
+            Exchange.ConnectToExchangeService(new ExchangeSettings()
             {
                 ServerAddress = serverAddressInCorrectFormat,
             });
@@ -109,7 +109,7 @@ namespace Frends.Exchange.ReadEmail.Tests
             {
                 AttachmentSaveDirectory = dummyDirPath,
             };
-            Util.SaveAttachments(msgAndFiles.Item1.Attachments, options);
+            ReadEmail.Exchange.SaveAttachments(msgAndFiles.Item1.Attachments, options);
 
             foreach (var fileInfo in msgAndFiles.Item2)
             {
@@ -176,45 +176,11 @@ namespace Frends.Exchange.ReadEmail.Tests
 
         private static ExchangeService CreateCertainTypedServiceWithConnectMethod(ExchangeServerVersion exchangeVersion)
         {
-            return Util.ConnectToExchangeService(new ExchangeSettings()
+            return Exchange.ConnectToExchangeService(new ExchangeSettings()
             {
                 ExchangeServerVersion = exchangeVersion,
                 ServerAddress = serverAddressInCorrectFormat
             });
-        }
-
-        /// <summary>
-        /// Tests that Util
-        /// <list type="number">
-        /// <item>contains a method with a name RedirectionUrlValidationCallback</item>
-        /// <item>the method returns a <see cref="bool"/></item>
-        /// <item>the method takes one <see cref="string"/> param</item>
-        /// <item>the method returns true when the passed param url has https scheme</item>
-        /// <item>the method returns false when the passed param url doesn't have https scheme</item>
-        /// </list>
-        /// </summary>
-        [Test]
-        public void RedirectionUrlValidationCallbackReturnsAsExpected()
-        {
-            var args = new[]
-            {
-                "http://not.nice.url.com"
-            };
-            var method = typeof(Util).GetMethod("RedirectionUrlValidationCallback");
-            Assert.IsNotNull(method);
-            Assert.AreEqual(typeof(bool), method!.ReturnType);
-            var methodParam = method.GetParameters();
-            Assert.IsNotNull(methodParam);
-            Assert.NotZero(methodParam.Length);
-            Assert.AreEqual(typeof(string), methodParam[0].ParameterType);
-
-            var result = method.Invoke(null, args);
-            Assert.IsInstanceOf(typeof(bool), result, "The method provided for RedirectionUrlValidationCallback doesn't return a bool.");
-            Assert.IsFalse((bool)result!);
-
-            args[0] = "https://nice.url.com";
-            result = method.Invoke(null, args);
-            Assert.IsTrue((bool)result!);
         }
 
         private static EmailMessage SendTestEmail(ExchangeSettings settings)
@@ -222,7 +188,7 @@ namespace Frends.Exchange.ReadEmail.Tests
             var tempDirPath = Path.Combine(Path.GetTempPath(), "emailsendtest");
             Directory.CreateDirectory(tempDirPath);
 
-            var service = Util.ConnectToExchangeService(settings);
+            var service = Exchange.ConnectToExchangeService(settings);
             var msgAndFiles = CreateEmailMessageWithAttachments(tempDirPath, service);
 
             msgAndFiles.Item1.Subject = $"Test email {Guid.NewGuid()}";
@@ -260,7 +226,7 @@ namespace Frends.Exchange.ReadEmail.Tests
 
             Assert.IsNotNull(receivedEmail);
 
-            RemoveEmailMessage(Util.ConnectToExchangeService(settings), receivedEmail!.Id);
+            RemoveEmailMessage(ReadEmail.Exchange.ConnectToExchangeService(settings), receivedEmail!.Id);
         }
 
         public static void RemoveEmailMessage(ExchangeService service, string msgId)
