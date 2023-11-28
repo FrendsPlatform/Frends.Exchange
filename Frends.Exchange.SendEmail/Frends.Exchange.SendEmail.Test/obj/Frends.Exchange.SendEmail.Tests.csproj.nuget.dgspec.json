@@ -1,0 +1,159 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail.Test\\Frends.Exchange.SendEmail.Tests.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail.Test\\Frends.Exchange.SendEmail.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail.Test\\Frends.Exchange.SendEmail.Tests.csproj",
+        "projectName": "Frends.Exchange.SendEmail.Tests",
+        "projectPath": "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail.Test\\Frends.Exchange.SendEmail.Tests.csproj",
+        "packagesPath": "C:\\Users\\tossate\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail.Test\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\tossate\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Users\\tossate\\source\\NuGet packages": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail.csproj": {
+                "projectPath": "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "MSTest.TestAdapter": {
+              "target": "Package",
+              "version": "[2.1.2, )"
+            },
+            "MSTest.TestFramework": {
+              "target": "Package",
+              "version": "[2.2.10, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.1.0, )"
+            },
+            "coverlet.collector": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.1.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail.csproj",
+        "projectName": "Frends.Exchange.SendEmail",
+        "projectPath": "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail.csproj",
+        "packagesPath": "C:\\Users\\tossate\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\tossate\\source\\repos\\Frends.Exchange\\Frends.Exchange.SendEmail\\Frends.Exchange.SendEmail\\obj\\",
+        "projectStyle": "PackageReference",
+        "crossTargeting": true,
+        "configFilePaths": [
+          "C:\\Users\\tossate\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Users\\tossate\\source\\NuGet packages": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Azure.Identity": {
+              "target": "Package",
+              "version": "[1.10.4, )"
+            },
+            "Microsoft.Graph": {
+              "target": "Package",
+              "version": "[5.35.0, )"
+            },
+            "MimeKit": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

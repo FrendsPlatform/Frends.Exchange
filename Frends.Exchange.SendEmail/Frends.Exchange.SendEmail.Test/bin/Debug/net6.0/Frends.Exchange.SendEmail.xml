@@ -1,0 +1,281 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Frends.Exchange.SendEmail</name>
+    </assembly>
+    <members>
+        <member name="T:Frends.Exchange.SendEmail.Definitions.Attachments">
+            <summary>
+            Attachment parameters.
+            </summary>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Attachments.AttachmentType">
+            <summary>
+            Chooses if the attachment file is created from a string or copied from disk. 
+            This determines how the attachment is added to the email.
+            </summary>
+            <example>AttachmentTypes.FileAttachment</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Attachments.FileName">
+            <summary>
+            Name of the attachment file.
+            </summary>
+            <example>message.txt</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Attachments.FileContent">
+            <summary>
+            Content of the attachment file. 
+            </summary>
+            <example>Hello, World!</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Attachments.FilePath">
+            <summary>
+            Attachment file's path. 
+            If the path ends in a directory, all files in that folder with given Attachments.FileMask are added as attachments.
+            </summary>
+            <example>C:\temp\message.txt</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Attachments.FileMask">
+            <summary>
+            Filemask. 
+            </summary>
+            <example>*.txt</example>
+        </member>
+        <member name="T:Frends.Exchange.SendEmail.Definitions.Connection">
+            <summary>
+            Connection parameters.
+            </summary>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Connection.X509CertificateFilePath">
+            <summary>
+            The path to a file which contains both the client certificate and private key.
+            </summary>
+            <example>c:\temp\mycert.pfx</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Connection.ClientSecret">
+            <summary>
+            The secret key of the client application. 
+            </summary>
+            <example>Y2lzY29zeXN0ZW1zOmMxc2Nv</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Connection.Username">
+            <summary>
+            Username of the user. 
+            </summary>
+            <example>username@example.com</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Connection.Password">
+            <summary>
+            Use this password to log in to the SMTP server.
+            This is used along with the username to log in to the SMTP server.
+            </summary>
+            <example>password123</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Connection.ClientId">
+            <summary>
+            App ID for fetching access token. 
+            This is the unique identifier for your application.
+            </summary>
+            <example>4a1aa1d9-c16a-40a2-bd7d-2bd40babe4ff</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Connection.TenantId">
+            <summary>
+            Tenant ID for fetching access token. 
+            This is the unique identifier of your Azure AD tenant.
+            </summary>
+            <example>9188040d-6c67-4c5b-b112-36a304b66dad</example>
+        </member>
+        <member name="T:Frends.Exchange.SendEmail.Definitions.AttachmentTypes">
+            <summary>
+            Attachment type options.
+            </summary>
+        </member>
+        <member name="F:Frends.Exchange.SendEmail.Definitions.AttachmentTypes.FileAttachment">
+            <summary>
+            Select this if the attachment is a file. This means the attachment will be read from a file on disk.
+            </summary>
+        </member>
+        <member name="F:Frends.Exchange.SendEmail.Definitions.AttachmentTypes.AttachmentFromString">
+            <summary>
+            Select this if the attachment file should be created from a string. This means the attachment will be created from a string in your code.
+            </summary>
+        </member>
+        <member name="T:Frends.Exchange.SendEmail.Definitions.ImportanceLevels">
+            Importance level options.
+        </member>
+        <member name="F:Frends.Exchange.SendEmail.Definitions.ImportanceLevels.Low">
+            <summary>
+            Select this if the email is of low importance. This might be used for routine or informational emails.
+            </summary>
+        </member>
+        <member name="F:Frends.Exchange.SendEmail.Definitions.ImportanceLevels.Normal">
+            <summary>
+            Select this if the email is of normal importance. This is the default value for most emails.
+            </summary>
+        </member>
+        <member name="F:Frends.Exchange.SendEmail.Definitions.ImportanceLevels.High">
+            <summary>
+            Select this if the email is of high importance. This might be used for urgent or time-sensitive emails.
+            </summary>
+        </member>
+        <member name="T:Frends.Exchange.SendEmail.Definitions.AuthenticationProviders">
+            <summary>
+            Authentication provider options.
+            </summary>
+        </member>
+        <member name="F:Frends.Exchange.SendEmail.Definitions.AuthenticationProviders.ClientCredentialsCertificate">
+            <summary>
+            Select this if the authentication should be done using a client certificate. This requires a certificate file and private key.
+            </summary>
+        </member>
+        <member name="F:Frends.Exchange.SendEmail.Definitions.AuthenticationProviders.ClientCredentialsSecret">
+            <summary>
+            Select this if the authentication should be done using a client secret. This requires a secret key from your application registration.
+            </summary>
+        </member>
+        <member name="F:Frends.Exchange.SendEmail.Definitions.AuthenticationProviders.UsernamePassword">
+            <summary>
+            Select this if the authentication should be done using a username and password. This requires the username and password of the user.
+            </summary>
+        </member>
+        <member name="T:Frends.Exchange.SendEmail.Definitions.Input">
+            <summary>
+            Input parameters.
+            </summary>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Input.From">
+            <summary>
+            Sender email address. 
+            This is the email address that will appear in the "From" field of the email.
+            </summary>
+            <example>sender@example.com</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Input.To">
+            <summary>
+            Recipient addresses separated by ',' or ';'. 
+            These are the main recipients of the email.
+            </summary>
+            <example>recipient1@example.com, recipient2@example.com</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Input.Cc">
+            <summary>
+            Cc recipient addresses separated by ',' or ';'. 
+            These recipients will receive a copy of the email.
+            </summary>
+            <example>cc1@example.com, cc2@example.com</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Input.Bcc">
+            <summary>
+            Bcc recipient addresses separated by ',' or ';'. 
+            These recipients will receive a copy of the email, but other recipients will not see their email addresses.
+            </summary>
+            <example>bcc1@example.com, bcc2@example.com</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Input.Subject">
+            <summary>
+            Email message's subject. 
+            This is the main topic or title of the email.
+            </summary>
+            <example>Meeting Reminder</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Input.Message">
+            <summary>
+            Body of the message. 
+            This is the main content of the email.
+            </summary>
+            <example>Don't forget about our meeting tomorrow at 10am.</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Input.IsMessageHtml">
+            <summary>
+            Set this true if the message is HTML. 
+            This allows you to send emails with HTML formatting.
+            </summary>
+            <example>false</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Input.Importance">
+            <summary>
+            Importance level. 
+            This sets the importance level of the email (e.g., Low, Normal, High).
+            </summary>
+            <example>ImportanceLevels.Normal</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Input.SaveToSentItems">
+            <summary>
+            Indicates whether to save the message in Sent Items. 
+            If set to true, a copy of the email will be saved in the "Sent Items" folder.
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Input.Attachments">
+            <summary>
+            Attachments.
+            </summary>
+            <example>
+                { AttachmentTypes.AttachmentFromString, "message.txt", "Hello, World!" }, 
+                { AttachmentTypes.FileAttachment, "C:\temp\message.txt", "*.txt" }
+            </example>
+        </member>
+        <member name="T:Frends.Exchange.SendEmail.Definitions.Options">
+            <summary>
+            Options parameters.
+            </summary>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Options.ThrowExceptionOnFailure">
+            <summary>
+            Value indicating whether an error should stop the Task and throw an exception (true) or try to continue processing and add a new object to Result.Data list as { EmailSent = false, StatusString = "Error message." }
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Options.ThrowExceptionIfAttachmentNotFound">
+            <summary>
+            If set to true and no files match the given path, an exception is thrown. 
+            This is used to ensure that the email has the correct attachments before being sent.
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="T:Frends.Exchange.SendEmail.Definitions.Output">
+            <summary>
+            Result of an email sending operation.
+            </summary>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Output.EmailSent">
+            <summary>
+            Value is true if the email was sent successfully.
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Output.MessageStatus">
+            <summary>
+            Contains information about the operation.
+            </summary>
+            <example>"Message was sent"</example>
+        </member>
+        <member name="T:Frends.Exchange.SendEmail.Definitions.Result">
+            <summary>
+            Result.
+            </summary>
+        </member>
+        <member name="P:Frends.Exchange.SendEmail.Definitions.Result.Success">
+            <summary>
+            Gets a value indicating whether Task was executed successfully.
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="T:Frends.Exchange.SendEmail.Exchange">
+            <summary>
+            Google Drive Download Task.
+            </summary>
+        </member>
+        <member name="M:Frends.Exchange.SendEmail.Exchange.SendEmail(Frends.Exchange.SendEmail.Definitions.Connection,Frends.Exchange.SendEmail.Definitions.Input,Frends.Exchange.SendEmail.Definitions.Options,System.Threading.CancellationToken)">
+            <summary>
+            Download objects from Google Drive.
+            [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Exchange.SendEmail)
+            </summary>
+            <param name="connection">Connection parameters.</param>
+            <param name="input">Input parameters</param>
+            <param name="options">Options parameters.</param>
+            <param name="cancellationToken">Token received from Frends to cancel this Task.</param>
+            <returns>Object { bool Success, List&lt;Output&gt; Data }</returns>
+        </member>
+    </members>
+</doc>

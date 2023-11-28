@@ -1,0 +1,15 @@
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\bin\Debug\net6.0\FrendsTaskMetadata.json
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\bin\Debug\net6.0\Frends.Exchange.SendEmail.deps.json
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\bin\Debug\net6.0\Frends.Exchange.SendEmail.dll
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\bin\Debug\net6.0\Frends.Exchange.SendEmail.pdb
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\bin\Debug\net6.0\Frends.Exchange.SendEmail.xml
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\obj\Debug\net6.0\Frends.Exchange.SendEmail.csproj.AssemblyReference.cache
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\obj\Debug\net6.0\Frends.Exchange.SendEmail.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\obj\Debug\net6.0\Frends.Exchange.SendEmail.AssemblyInfoInputs.cache
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\obj\Debug\net6.0\Frends.Exchange.SendEmail.AssemblyInfo.cs
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\obj\Debug\net6.0\Frends.Exchange.SendEmail.csproj.CoreCompileInputs.cache
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\obj\Debug\net6.0\Frends.Exchange.SendEmail.dll
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\obj\Debug\net6.0\refint\Frends.Exchange.SendEmail.dll
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\obj\Debug\net6.0\Frends.Exchange.SendEmail.xml
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\obj\Debug\net6.0\Frends.Exchange.SendEmail.pdb
+C:\Users\tossate\source\repos\Frends.Exchange\Frends.Exchange.SendEmail\Frends.Exchange.SendEmail\obj\Debug\net6.0\ref\Frends.Exchange.SendEmail.dll
