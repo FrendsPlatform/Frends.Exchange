@@ -4,44 +4,53 @@ using System.ComponentModel.DataAnnotations;
 namespace Frends.Exchange.SendEmail.Definitions;
 
 /// <summary>
-/// Connection parameters.
+/// Parameters for establishing a connection.
 /// </summary>
 public class Connection
 {
+    /// <summary>
+    /// Specifies the authentication provider to use.
+    /// </summary>
+    /// <remarks>
+    /// This determines the type of authentication to use when establishing a connection. The available options are:
+    /// - `AuthenticationProviders.UsernamePassword`: Uses a username and password to authenticate.
+    /// - `AuthenticationProviders.ClientCredentialsCertificate`: Uses a client certificate and private key to authenticate.
+    /// - `AuthenticationProviders.ClientCredentialsSecret`: Uses a client secret to authenticate.
+    /// </remarks>
+    [DefaultValue(AuthenticationProviders.UsernamePassword)]
     public AuthenticationProviders AuthenticationProvider { get; set; }
 
     /// <summary>
-    /// The path to a file which contains both the client certificate and private key.
+    /// The path to a file that contains both the client certificate and private key.
     /// </summary>
     /// <example>c:\temp\mycert.pfx</example>
-    [UIHint(nameof(AuthenticationProviders), "", AuthenticationProviders.ClientCredentialsCertificate)]
+    [UIHint(nameof(AuthenticationProvider), "", AuthenticationProviders.ClientCredentialsCertificate)]
     public string X509CertificateFilePath { get; set; }
 
     /// <summary>
     /// The secret key of the client application. 
     /// </summary>
     /// <example>Y2lzY29zeXN0ZW1zOmMxc2Nv</example>
-    [UIHint(nameof(AuthenticationProviders), "", AuthenticationProviders.ClientCredentialsSecret)]
+    [UIHint(nameof(AuthenticationProvider), "", AuthenticationProviders.ClientCredentialsSecret)]
     public string ClientSecret { get; set; }
 
     /// <summary>
-    /// Username of the user. 
+    /// The username of the user. 
     /// </summary>
     /// <example>username@example.com</example>
-    [UIHint(nameof(AuthenticationProviders), "", AuthenticationProviders.UsernamePassword)]
+    [UIHint(nameof(AuthenticationProvider), "", AuthenticationProviders.UsernamePassword)]
     public string Username { get; set; }
 
     /// <summary>
-    /// Use this password to log in to the SMTP server.
-    /// This is used along with the username to log in to the SMTP server.
+    /// The password of the user.
     /// </summary>
     /// <example>password123</example>
-    [UIHint(nameof(AuthenticationProviders), "", AuthenticationProviders.UsernamePassword)]
+    [UIHint(nameof(AuthenticationProvider), "", AuthenticationProviders.UsernamePassword)]
     [PasswordPropertyText]
     public string Password { get; set; }
 
     /// <summary>
-    /// App ID for fetching access token. 
+    /// The app ID for fetching an access token. 
     /// This is the unique identifier for your application.
     /// </summary>
     /// <example>4a1aa1d9-c16a-40a2-bd7d-2bd40babe4ff</example>
@@ -49,7 +58,7 @@ public class Connection
     public string ClientId { get; set; }
 
     /// <summary>
-    /// Tenant ID for fetching access token. 
+    /// The tenant ID for fetching an access token. 
     /// This is the unique identifier of your Azure AD tenant.
     /// </summary>
     /// <example>9188040d-6c67-4c5b-b112-36a304b66dad</example>

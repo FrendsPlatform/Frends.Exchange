@@ -1,5 +1,5 @@
 # Frends.Exchange.SendEmail
-Frends Tasks for downloading objects from Google Drive.
+Frends Tasks for sending a Microsoft Exchange email.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) 
 [![Build](https://github.com/FrendsPlatform/Frends.Exchange/actions/workflows/SendEmail_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Exchange/actions)

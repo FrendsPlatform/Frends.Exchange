@@ -6,171 +6,37 @@ using Microsoft.Graph.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Frends.Exchange.SendEmail;
 
 /// <summary>
-/// Google Drive Download Task.
+/// Microsoft Exchange Task.
 /// </summary>
 public class Exchange
 {
     /// <summary>
-    /// Download objects from Google Drive.
+    /// List of temp files to be deleted.
+    /// </summary>
+    internal static List<string> tempFilePaths = new();
+
+    /// <summary>
+    /// Send a Microsoft Exchange email.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Exchange.SendEmail)
     /// </summary>
-    /// <param name="connection">Connection parameters.</param>
-    /// <param name="input">Input parameters</param>
-    /// <param name="options">Options parameters.</param>
+    /// <param name="connection">Parameters for establishing a connection.</param>
+    /// <param name="input">Email content</param>
+    /// <param name="options">Options for controlling the behavior of this Task.</param>
     /// <param name="cancellationToken">Token received from Frends to cancel this Task.</param>
-    /// <returns>Object { bool Success, List&lt;Output&gt; Data }</returns>
+    /// <returns>Object { bool Success, string Data }</returns>
     public static async Task<Result> SendEmail([PropertyTab] Connection connection, [PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         InputCheck(connection, input);
-        using var client = CreateGraphServiceClient(connection);
-        if (input.Attachments != null && input.Attachments.Length > 0)
-            return new Result(true, await SendExchangeEmailWithAttachments(input, options, client, cancellationToken));
-        else
-            return new Result(true, await SendExchangeEmail(input, options.ThrowExceptionOnFailure, client, cancellationToken));
-    }
-
-    private static async Task<List<Output>> SendExchangeEmail(Input input, bool throwExceptionOnFailure,  GraphServiceClient graphClient, CancellationToken cancellationToken)
-    {
-        var outputList = new List<Output>();
-
-        try
-        {
-            var message = GetMessageBody(input);
-            var requestBody = new SendMailPostRequestBody()
-            {
-                Message = message,
-                SaveToSentItems = input.SaveToSentItems
-            };
-            await graphClient.Me.SendMail.PostAsync(requestBody, cancellationToken: cancellationToken);
-            outputList.Add(new Output() { EmailSent = true, MessageStatus = $"Email sent to {input.To}." });
-            return outputList;
-        }
-        catch (Exception ex)
-        {
-            if (throwExceptionOnFailure)
-                throw;
-            outputList.Add(new Output() { EmailSent = false, MessageStatus = $"Failed to send an email to {input.To}. {ex}" });
-        }
-
-        return outputList;
-    }
-
-    private static async Task<List<Output>> SendExchangeEmailWithAttachments(Input input, Options options, GraphServiceClient graphClient, CancellationToken cancellationToken)
-    {
-        var outputList = new List<Output>();
-        var message = GetMessageBody(input);
-        var fileList = new List<(string filePath, bool isLarge)>(); // boolean is used to determine whether the file will be deleted after sending.
-
-        foreach (var attachment in input.Attachments)
-        {
-            switch (attachment.AttachmentType)
-            {
-                case AttachmentTypes.FileAttachment:
-                    // If the path ends in a directory, all files in that folder with given attachment.FileMask are added as attachments.
-                    var files = Directory.Exists(attachment.FilePath) ? Directory.GetFiles(attachment.FilePath, attachment.FileMask) : new string[] { attachment.FilePath };
-
-                    if (files.Length == 0 && options.ThrowExceptionIfAttachmentNotFound)
-                        throw new Exception($"No files found in directory {attachment.FilePath}.");
-
-                    foreach (var file in files)
-                        fileList.Add((file, false));
-                    break;
-                case AttachmentTypes.AttachmentFromString:
-                    var tempFilePath = CreateTemporaryFile(attachment);
-                    fileList.Add((tempFilePath, true));
-                    break;
-            }
-        }
-
-        foreach (var (filePath, isLarge) in fileList)
-        {
-            var attachmentSizeInBytes = new FileInfo(filePath).Length;
-            var fileName = Path.GetFileName(filePath);
-
-            // 3MB or less
-            if (attachmentSizeInBytes <= 3 * 1024 * 1024) 
-            {
-                byte[] littleStream = File.ReadAllBytes(filePath);
-                message.Attachments = new List<Attachment>
-                {
-                    new Attachment
-                    {
-                        OdataType = "#microsoft.graph.fileAttachment",
-                        Name = fileName,
-                        AdditionalData = new Dictionary<string, object> { { "contentBytes", Convert.ToBase64String(littleStream) } },
-                    }
-                };
-
-                try
-                {
-                    var postSmallAttachment = graphClient.Users[input.From].Messages.PostAsync(message, cancellationToken: cancellationToken).GetAwaiter().GetResult();
-                    outputList.Add(new Output() { EmailSent = true, MessageStatus = $"Email sent to {input.To} with an attachment {fileName}" });
-                }
-                catch (Exception ex)
-                {
-                    if (options.ThrowExceptionOnFailure)
-                        throw;
-                    outputList.Add(new Output() { EmailSent = false, MessageStatus = $"Failed to send an email to {input.To} with an attachment {fileName}. {ex}" });
-                }
-            }
-            // More than 3MB
-            else
-            {
-                var maxSliceSize = 320 * 1024;
-                var fileStream = File.OpenRead(filePath);
-                var uploadRequestBody = new Microsoft.Graph.Users.Item.Messages.Item.Attachments.CreateUploadSession.CreateUploadSessionPostRequestBody
-                {
-                    AttachmentItem = new AttachmentItem
-                    {
-                        AttachmentType = AttachmentType.File,
-                        Name = fileName,
-                        Size = fileStream.Length,
-                        ContentType = "application/octet-stream"
-                    },
-                };
-
-                var uploadSession = graphClient.Users[input.From].Messages[message.Id].Attachments.CreateUploadSession.PostAsync(uploadRequestBody, cancellationToken: cancellationToken).GetAwaiter().GetResult();
-                var fileUploadTask = new LargeFileUploadTask<FileAttachment>(uploadSession, fileStream, maxSliceSize);
-                var totalLength = fileStream.Length;
-
-                // Create a callback that is invoked after each slice is uploaded
-                IProgress<long> progress = new Progress<long>(prog =>
-                {
-                    Console.WriteLine($"Uploaded {prog} bytes of {totalLength} bytes");
-                });
-                try
-                {
-                    var largeAttachmentUploadResult = fileUploadTask.UploadAsync(progress, cancellationToken: cancellationToken).GetAwaiter().GetResult();
-                    if (largeAttachmentUploadResult.UploadSucceeded)
-                        outputList.Add(new Output() { EmailSent = true, MessageStatus = $"Email sent to {input.To} with an attachment {fileName} (size: {fileStream.Length})." });
-                    else
-                    {
-                        if (options.ThrowExceptionOnFailure)
-                            throw new Exception($"Failed to send an email to {input.To} with an attachment {fileName}.");
-                        outputList.Add(new Output() { EmailSent = false, MessageStatus = $"Failed to send an email to {input.To} with an attachment {fileName}." });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (options.ThrowExceptionOnFailure)
-                        throw;
-                    outputList.Add(new Output() { EmailSent = false, MessageStatus = ex.Message });
-                }
-
-                graphClient.Users[input.From].Messages[message.Id].Send.PostAsync(cancellationToken: cancellationToken).GetAwaiter().GetResult();
-            }
-
-            if (isLarge)
-                CleanUpTempFiles(filePath);
-        }
-        return outputList;
+        return await SendExchangeEmail(input, connection, options, cancellationToken);
     }
 
     private static void InputCheck(Connection connection, Input input)
@@ -179,22 +45,23 @@ public class Exchange
         {
             case AuthenticationProviders.ClientCredentialsCertificate:
                 if (string.IsNullOrWhiteSpace(connection.TenantId) || string.IsNullOrWhiteSpace(connection.ClientId) || string.IsNullOrWhiteSpace(connection.X509CertificateFilePath))
-                    throw new ArgumentException(@"One or more required connection values missing:", $"{nameof(connection.TenantId)}, {nameof(connection.ClientId)}, {nameof(connection.X509CertificateFilePath)}.");
+                    throw new ArgumentNullException(@"One or more required connection values missing:", $"{nameof(connection.TenantId)}, {nameof(connection.ClientId)}, {nameof(connection.X509CertificateFilePath)}.");
                 break;
             case AuthenticationProviders.ClientCredentialsSecret:
                 if (string.IsNullOrWhiteSpace(connection.TenantId) || string.IsNullOrWhiteSpace(connection.ClientId) || string.IsNullOrWhiteSpace(connection.ClientSecret))
-                    throw new ArgumentException(@"One or more required connection values missing:", $"{nameof(connection.TenantId)}, {nameof(connection.ClientId)}, {nameof(connection.ClientSecret)}.");
+                    throw new ArgumentNullException(@"One or more required connection values missing:", $"{nameof(connection.TenantId)}, {nameof(connection.ClientId)}, {nameof(connection.ClientSecret)}.");
                 break;
             case AuthenticationProviders.UsernamePassword:
                 if (string.IsNullOrWhiteSpace(connection.Username) || string.IsNullOrWhiteSpace(connection.Password) || string.IsNullOrWhiteSpace(connection.TenantId) || string.IsNullOrWhiteSpace(connection.ClientId))
-                    throw new ArgumentException(@"One or more required connection values missing:", $"{nameof(connection.Username)}, {nameof(connection.Password)}, {nameof(connection.TenantId)}, {nameof(connection.ClientId)}.");
+                    throw new ArgumentNullException(@"One or more required connection values missing:", $"{nameof(connection.Username)}, {nameof(connection.Password)}, {nameof(connection.TenantId)}, {nameof(connection.ClientId)}.");
                 break;
         }
 
-        if (string.IsNullOrWhiteSpace(input.From) || string.IsNullOrWhiteSpace(input.To))
-            throw new ArgumentException(@"One or more required message values missing:", $"{nameof(input.From)}, {nameof(input.To)}");
+        if (string.IsNullOrWhiteSpace(input.To))
+            throw new ArgumentNullException(@"One or more required message values missing:", $"{nameof(input.To)}");
     }
 
+    [ExcludeFromCodeCoverage(Justification = "Can't get cert and clientsecret.")]
     private static GraphServiceClient CreateGraphServiceClient(Connection connection)
     {
         var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
@@ -215,31 +82,9 @@ public class Exchange
         }
     }
 
-    private static Message GetMessageBody(Input input)
-    {
-        return new Message
-        {
-            Subject = input.Subject,
-            Body = new ItemBody
-            {
-                ContentType = input.IsMessageHtml ? BodyType.Html : BodyType.Text,
-                Content = input.Message,
-            },
-            ToRecipients = string.IsNullOrWhiteSpace(input.To) ? null : GetRecipients(input.To),
-            CcRecipients = string.IsNullOrWhiteSpace(input.Cc) ? null : GetRecipients(input.Cc),
-            BccRecipients = string.IsNullOrWhiteSpace(input.Bcc) ? null : GetRecipients(input.Bcc),
-            Importance = GetImportance(input.Importance),
-        };
-    }
-
     private static List<Recipient> GetRecipients(string to)
     {
-        var recipientList = new List<Recipient>();
-        var recipients = to.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
-        foreach (var receiver in recipients)
-            recipientList.Add(new Recipient { EmailAddress = new EmailAddress { Address = receiver } });
-
-        return recipientList;
+        return to.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(receiver => new Recipient { EmailAddress = new EmailAddress { Address = receiver.Replace(" ", "") } }).ToList();
     }
 
     private static Importance GetImportance(ImportanceLevels importance)
@@ -263,10 +108,188 @@ public class Exchange
         return filePath;
     }
 
-    private static void CleanUpTempFiles(string tempFile)
+    private static void CleanUpTempFiles()
     {
-        var dir = Path.GetDirectoryName(tempFile);
-        if (File.Exists(tempFile)) File.Delete(tempFile);
-        if (Directory.GetFiles(dir) is null) Directory.Delete(dir, true);
+        try
+        {
+            foreach (var file in tempFilePaths)
+                if (File.Exists(file))
+                    File.Delete(file);
+        }
+        catch (Exception)
+        {
+            // Do nothing if e.g. file cannot be deleted.
+        }
+    }
+
+    private static async Task<Message> GetAttachments(string from, Attachments[] attachments, Options options, GraphServiceClient client, Message message, CancellationToken cancellationToken)
+    {
+        var attachmentList = new List<Attachment>();
+        var fileList = new List<string>();
+        var containLargeFile = false;
+
+        foreach (var attachment in attachments)
+        {
+            switch (attachment.AttachmentType)
+            {
+                case AttachmentTypes.FileAttachment:
+                    // If the path ends in a directory, all files in that folder with given attachment.FileMask are added as attachments.
+                    string[] files = null;
+                    if (File.Exists(attachment.FilePath))
+                        files = new[] { attachment.FilePath };
+                    else if (Directory.Exists(attachment.FilePath) && !File.Exists(attachment.FilePath))
+                        files = Directory.GetFiles(attachment.FilePath, attachment.FileMask);
+
+                    if (files != null && files.Length > 0)
+                    {
+                        foreach (var file in files)
+                        {
+                            if (new FileInfo(file).Length > 3 * 1024 * 1024)
+                                containLargeFile = true;
+
+                            fileList.Add(file);
+                        }
+                    }
+                    else
+                        if (options.ThrowExceptionIfAttachmentNotFound)
+                        throw new Exception($"No files found in directory {attachment.FilePath}.");
+
+                    break;
+                case AttachmentTypes.AttachmentFromString:
+                    var tempFilePath = CreateTemporaryFile(attachment);
+                    if (new FileInfo(tempFilePath).Length > 3 * 1024 * 1024)
+                        containLargeFile = true;
+
+                    fileList.Add(tempFilePath);
+                    tempFilePaths.Add(tempFilePath);
+                    break;
+            }
+        }
+
+        // Upload (large) or prepare attachment (small)
+        if (containLargeFile)
+        {
+            //Create draft message
+            message = string.IsNullOrWhiteSpace(from)
+                        ? await client.Me.Messages.PostAsync(message, cancellationToken: cancellationToken)
+                        : await client.Users[from].Messages.PostAsync(message, cancellationToken: cancellationToken);
+
+            foreach (var file in fileList)
+            {
+                var maxSliceSize = 320 * 1024;
+                var fileName = Path.GetFileName(file);
+                UploadSession uploadSession;
+                using var fileStream = File.OpenRead(file);
+
+                if (string.IsNullOrEmpty(from))
+                {
+                    var uploadRequestBody = new Microsoft.Graph.Me.Messages.Item.Attachments.CreateUploadSession.CreateUploadSessionPostRequestBody
+                    {
+                        AttachmentItem = new AttachmentItem
+                        {
+                            AttachmentType = AttachmentType.File,
+                            Name = fileName,
+                            Size = fileStream.Length,
+                            ContentType = "application/octet-stream"
+                        },
+                    };
+                    uploadSession = await client.Me.Messages[message.Id].Attachments.CreateUploadSession.PostAsync(uploadRequestBody, cancellationToken: cancellationToken);
+                }
+                else
+                {
+                    var uploadRequestBody = new Microsoft.Graph.Users.Item.Messages.Item.Attachments.CreateUploadSession.CreateUploadSessionPostRequestBody
+                    {
+                        AttachmentItem = new AttachmentItem
+                        {
+                            AttachmentType = AttachmentType.File,
+                            Name = fileName,
+                            Size = fileStream.Length,
+                            ContentType = "application/octet-stream"
+                        },
+                    };
+                    uploadSession = await client.Users[from].Messages[message.Id].Attachments.CreateUploadSession.PostAsync(uploadRequestBody, cancellationToken: cancellationToken);
+                }
+
+                var fileUploadTask = new LargeFileUploadTask<FileAttachment>(uploadSession, fileStream, maxSliceSize);
+                var totalLength = fileStream.Length;
+                var largeAttachmentUploadResult = await fileUploadTask.UploadAsync(cancellationToken: cancellationToken);
+
+                if (!largeAttachmentUploadResult.UploadSucceeded)
+                    throw new Exception($@"Failed to upload large attachment ""{file}"".");
+            }
+        }
+        else
+        {
+            foreach (var file in fileList)
+            {
+                var fileName = Path.GetFileName(file);
+                var littleStream = File.ReadAllBytes(file);
+                attachmentList.Add(new Attachment
+                {
+                    OdataType = "#microsoft.graph.fileAttachment",
+                    Name = fileName,
+                    AdditionalData = new Dictionary<string, object> { { "contentBytes", Convert.ToBase64String(littleStream) } },
+                });
+            }
+            message.Attachments = attachmentList;
+        }
+
+        return message;
+    }
+
+    private static async Task<Result> SendExchangeEmail(Input input, Connection connection, Options options, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var client = CreateGraphServiceClient(connection);
+            var message = new Message
+            {
+                Subject = input.Subject,
+                Body = new ItemBody
+                {
+                    ContentType = input.IsMessageHtml ? BodyType.Html : BodyType.Text,
+                    Content = input.Message,
+                },
+                ToRecipients = string.IsNullOrWhiteSpace(input.To) ? new() : GetRecipients(input.To),
+                CcRecipients = string.IsNullOrWhiteSpace(input.Cc) ? new() : GetRecipients(input.Cc),
+                BccRecipients = string.IsNullOrWhiteSpace(input.Bcc) ? new() : GetRecipients(input.Bcc),
+                Importance = GetImportance(input.Importance),
+            };
+
+            if (input.Attachments != null && input.Attachments.Length > 0)
+                message = await GetAttachments(input.From, input.Attachments, options, client, message, cancellationToken);
+
+            if (string.IsNullOrWhiteSpace(input.From))
+            {
+                if (message.Id is null)
+                {
+                    var requestBody = new SendMailPostRequestBody() { Message = message, SaveToSentItems = input.SaveToSentItems };
+                    await client.Me.SendMail.PostAsync(requestBody, cancellationToken: cancellationToken);
+                }
+                else
+                    await client.Me.Messages[message.Id].Send.PostAsync(cancellationToken: cancellationToken);
+            }
+            else
+            {
+                if (message.Id is null)
+                {
+                    var userRequestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody() { Message = message, SaveToSentItems = input.SaveToSentItems };
+                    await client.Users[input.From].SendMail.PostAsync(userRequestBody, cancellationToken: cancellationToken);
+                }
+                else
+                    await client.Users[input.From].Messages[message.Id].Send.PostAsync(cancellationToken: cancellationToken);
+            }
+
+            CleanUpTempFiles();
+
+            return new Result(true, $"Email sent successfully.");
+        }
+        catch (Exception ex)
+        {
+            if (options.ThrowExceptionOnFailure)
+                throw;
+
+            return new Result(false, $"Failed to send an email. {ex.Message}");
+        }
     }
 }

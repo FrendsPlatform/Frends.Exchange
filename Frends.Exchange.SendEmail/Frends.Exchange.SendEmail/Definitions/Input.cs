@@ -3,7 +3,7 @@
 namespace Frends.Exchange.SendEmail.Definitions;
 
 /// <summary>
-/// Input parameters.
+/// Email content.
 /// </summary>
 public class Input
 {
@@ -54,7 +54,7 @@ public class Input
     /// This allows you to send emails with HTML formatting.
     /// </summary>
     /// <example>false</example>
-    [DefaultValue("false")]
+    [DefaultValue(false)]
     public bool IsMessageHtml { get; set; }
 
     /// <summary>
@@ -66,19 +66,18 @@ public class Input
     public ImportanceLevels Importance { get; set; }
 
     /// <summary>
-    /// Indicates whether to save the message in Sent Items. 
-    /// If set to true, a copy of the email will be saved in the "Sent Items" folder.
+    /// Indicates whether to save the message in Sent Items.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
     public bool SaveToSentItems { get; set; }
 
     /// <summary>
-    /// Attachments.
+    /// Email attachments.
     /// </summary>
     /// <example>
-    ///     { AttachmentTypes.AttachmentFromString, "message.txt", "Hello, World!" }, 
-    ///     { AttachmentTypes.FileAttachment, "C:\temp\message.txt", "*.txt" }
+    ///     { AttachmentTypes.FileAttachment, C:\temp\temp.txt, *.* }, 
+    ///     { AttachmentTypes.AttachmentFromString, temp.txt, "This is temp file." }
     /// </example>
     public Attachments[] Attachments { get; set; }
 }

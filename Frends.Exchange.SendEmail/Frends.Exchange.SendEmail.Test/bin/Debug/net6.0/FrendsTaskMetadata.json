@@ -1,7 +1,0 @@
-{
-  "Tasks": [
-    {
-      "TaskMethod": "Frends.Exchange.SendEmail.Exchange.SendEmail"
-    }
-  ]
-}

@@ -13,9 +13,15 @@ jobs:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
     with:
       workdir: Frends.Exchange.SendEmail
-      env_var_name_1: Exchange_CredBase64_Part1
-      env_var_name_2: Exchange_CredBase64_Part2
+      env_var_name_1: Exchange_User
+      env_var_name_2: Exchange_User2
+      env_var_name_3: Exchange_User_Password
+      env_var_name_4: Exchange_Application_ID
+      env_var_name_5: Exchange_Tenant_ID
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
-      env_var_value_1: ${{ secrets.Exchange_CREDBASE64_PART1 }}
-      env_var_value_2: ${{ secrets.Exchange_CREDBASE64_PART2 }}
+      env_var_value_1: ${{ secrets.EXCHANGE_USER }}
+      env_var_value_2: ${{ secrets.EXCHANGE_USER2 }}
+      env_var_value_3: ${{ secrets.EXCHANGE_USER_PASSWORD }}
+      env_var_value_4: ${{ secrets.EXCHANGE_APPLICATION_ID }}
+      env_var_value_5: ${{ secrets.EXCHANGE_TENANT_ID }}
