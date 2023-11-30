@@ -9,6 +9,7 @@ namespace Frends.Exchange.SendEmail.Tests;
 [TestClass]
 public class UnitTests
 {
+
     private readonly string? _user = Environment.GetEnvironmentVariable("Exchange_User");
     private readonly string? _user2 = Environment.GetEnvironmentVariable("Exchange_User2");
     private readonly string? _password = Environment.GetEnvironmentVariable("Exchange_User_Password");
