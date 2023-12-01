@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFrameworks>net6.0</TargetFrameworks>
+	<Version>1.0.0</Version>
+	<Authors>Frends</Authors>
+	<Copyright>Frends</Copyright>
+	<Company>Frends</Company>
+	<Product>Frends</Product>
+	<PackageTags>Frends</PackageTags>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<Description>Frends Tasks for sending a Microsoft Exchange email.</Description>
+	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.Exchange</RepositoryUrl>
+  </PropertyGroup>
+	
+  <ItemGroup>
+	  <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.10.4" />
+    <PackageReference Include="Microsoft.Graph" Version="5.35.0" />
+    <PackageReference Include="MimeKit" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
