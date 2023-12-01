@@ -1,9 +1,9 @@
-# Exchange
+# Frends.Exchange
 Frends Task for Microsoft Exchange operations.
 
 # Tasks
-- [Frends.MicrosoftTeams.ReadMessage](Frends.MicrosoftTeams.ReadMessage/README.md)
-- [Frends.MicrosoftTeams.SendMessage](Frends.MicrosoftTeams.SendMessage/README.md)
+- [Frends.Exchange.ReadMessage](Frends.Exchange.ReadMessage/README.md)
+- [Frends.Exchange.SendMessage](Frends.Exchange.SendMessage/README.md)
 
 # Contributing
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
