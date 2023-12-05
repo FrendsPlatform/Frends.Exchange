@@ -1,11 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.0.31912.275
+VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.Exchange.ReadEmail", "Frends.Exchange.ReadEmail\Frends.Exchange.ReadEmail.csproj", "{AC3A1F89-C83D-4956-9432-BAB2D1C9D4BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.Exchange.ReadEmail", "Frends.Exchange.ReadEmail\Frends.Exchange.ReadEmail.csproj", "{35C305C0-8108-4A98-BB1D-AFE5C926239E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frends.Exchange.ReadEmail.Tests", "Frends.Exchange.ReadEmail.Tests\Frends.Exchange.ReadEmail.Tests.csproj", "{F0CABD90-6332-4989-9392-A86230F07813}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{78F7F22E-6E20-4BCE-8362-0C558568B729}"
+	ProjectSection(SolutionItems) = preProject
+		CHANGELOG.md = CHANGELOG.md
+		README.md = README.md
+		..\.github\workflows\ReadEmail_build_and_test_on_main.yml = ..\.github\workflows\ReadEmail_build_and_test_on_main.yml
+		..\.github\workflows\ReadEmail_release.yml = ..\.github\workflows\ReadEmail_release.yml
+		..\.github\workflows\ReadEmail_build_and_test_on_push.yml = ..\.github\workflows\ReadEmail_build_and_test_on_push.yml
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.Exchange.ReadEmail.Tests", "Frends.Exchange.ReadEmail.Test\Frends.Exchange.ReadEmail.Tests.csproj", "{C2A1E867-FC58-4432-A4B7-5E1FC451C9EB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{35C305C0-8108-4A98-BB1D-AFE5C926239E} = {35C305C0-8108-4A98-BB1D-AFE5C926239E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,19 +25,19 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AC3A1F89-C83D-4956-9432-BAB2D1C9D4BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AC3A1F89-C83D-4956-9432-BAB2D1C9D4BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AC3A1F89-C83D-4956-9432-BAB2D1C9D4BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AC3A1F89-C83D-4956-9432-BAB2D1C9D4BF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F0CABD90-6332-4989-9392-A86230F07813}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F0CABD90-6332-4989-9392-A86230F07813}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F0CABD90-6332-4989-9392-A86230F07813}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F0CABD90-6332-4989-9392-A86230F07813}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35C305C0-8108-4A98-BB1D-AFE5C926239E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35C305C0-8108-4A98-BB1D-AFE5C926239E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35C305C0-8108-4A98-BB1D-AFE5C926239E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35C305C0-8108-4A98-BB1D-AFE5C926239E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2A1E867-FC58-4432-A4B7-5E1FC451C9EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2A1E867-FC58-4432-A4B7-5E1FC451C9EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2A1E867-FC58-4432-A4B7-5E1FC451C9EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2A1E867-FC58-4432-A4B7-5E1FC451C9EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A99916C6-9633-4F31-A40D-3AABF4EFBC78}
+		SolutionGuid = {55BC6629-85C9-48D8-8CA2-B0046AF1AF4B}
 	EndGlobalSection
 EndGlobal
