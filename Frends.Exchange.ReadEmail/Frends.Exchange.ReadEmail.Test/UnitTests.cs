@@ -17,6 +17,7 @@ public class UnitTests
     private static readonly string? _password = Environment.GetEnvironmentVariable("Exchange_User_Password");
     private static readonly string? _applicationID = Environment.GetEnvironmentVariable("Exchange_Application_ID");
     private static readonly string? _tenantID = Environment.GetEnvironmentVariable("Exchange_Tenant_ID");
+    private static readonly string? _clientSecret = Environment.GetEnvironmentVariable("Exchange_ClientSecret");
     private static Connection _connection = new();
     private static Input _input = new();
     private static Options _options = new();
@@ -49,7 +50,7 @@ public class UnitTests
             DestinationDirectory = _downloadDir,
             FileExistHandler = FileExistHandlers.Rename,
             CreateDirectory = true,
-            From = null,
+            From = _user,
             UpdateReadStatus = false,
         };
 
@@ -81,6 +82,18 @@ public class UnitTests
     [TestMethod]
     public async Task ReadEmailTest_ReadAndDownload_Inbox()
     {
+        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        Assert.IsTrue(result.Success);
+        Assert.IsTrue(result.Data.Count > 0);
+        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
+    }
+
+    [TestMethod]
+    public async Task ReadEmailTest_ReadAndDownload_Inbox_ClientCredentialsSecret()
+    {
+        _connection.AuthenticationProvider = AuthenticationProviders.ClientCredentialsSecret;
+        _connection.ClientSecret = _clientSecret;
         var result = await Exchange.ReadEmail(_connection, _input, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);

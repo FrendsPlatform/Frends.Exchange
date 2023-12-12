@@ -5,7 +5,6 @@ using Microsoft.Graph.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -24,14 +23,14 @@ public class Exchange
     internal static List<string> tempFilePaths = new();
 
     /// <summary>
-    /// Send a Microsoft Exchange email.
+    /// Read Microsoft Exchange emails and downloading their attachments.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Exchange.ReadEmail)
     /// </summary>
     /// <param name="connection">Parameters for establishing a connection.</param>
     /// <param name="input">Email content</param>
     /// <param name="options">Options for controlling the behavior of this Task.</param>
     /// <param name="cancellationToken">Token received from Frends to cancel this Task.</param>
-    /// <returns>Object { bool Success, string Data }</returns>
+    /// <returns>Object { bool success, List&lt;ResultObject&gt; data, List&lt;dynamic&gt; errorMessage }</returns>
     public static async Task<Result> ReadEmail([PropertyTab] Connection connection, [PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         var resultList = new List<ResultObject>();
@@ -41,7 +40,7 @@ public class Exchange
         {
             InputCheck(connection, input);
             GraphServiceClient client = CreateGraphServiceClient(connection);
-            var messageCollectionResponse = await GetMessageCollectionResponse(input, client, cancellationToken);
+            var messageCollectionResponse = await GetMessageCollectionResponse(input, connection.AuthenticationProvider, client, cancellationToken);
 
             if (messageCollectionResponse.Value != null)
             {
@@ -69,13 +68,13 @@ public class Exchange
                     };
 
                     if (input.DownloadAttachments && message.HasAttachments is true)
-                        resultObject.Attachments = await DownloadAttachments(input.FileExistHandler, input.DestinationDirectory, input.CreateDirectory, message, client, cancellationToken);
+                        resultObject.Attachments = await DownloadAttachments(input, connection.AuthenticationProvider, message, client, cancellationToken);
 
                     resultList.Add(resultObject);
 
                     // Email won't be marked as read without doing it manually
                     if (input.UpdateReadStatus)
-                        await UpdateMessageRead(input.From, message.Id, client, cancellationToken);
+                        await UpdateMessageRead(connection.AuthenticationProvider, input.From, message.Id, client, cancellationToken);
                 }
             }
         }
@@ -115,7 +114,6 @@ public class Exchange
             throw new Exception($@"{nameof(input.DestinationDirectory)} is set, but the directory {input.DestinationDirectory} does not exist. Set {nameof(input.CreateDirectory)} to true to create the specified directory.");
     }
 
-    [ExcludeFromCodeCoverage(Justification = "Can't get cert and clientsecret.")]
     private static GraphServiceClient CreateGraphServiceClient(Connection connection)
     {
         var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
@@ -136,9 +134,9 @@ public class Exchange
         }
     }
 
-    private static async Task<MessageCollectionResponse> GetMessageCollectionResponse(Input input, GraphServiceClient client, CancellationToken cancellationToken)
+    private static async Task<MessageCollectionResponse> GetMessageCollectionResponse(Input input, AuthenticationProviders authenticationProviders, GraphServiceClient client, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(input.From))
+        if (authenticationProviders is AuthenticationProviders.UsernamePassword)
         {
             return await client.Me.Messages.GetAsync((requestConfiguration) =>
             {
@@ -168,22 +166,30 @@ public class Exchange
         }, cancellationToken);
     }
 
-    private static async Task<List<Attachments>> DownloadAttachments(FileExistHandlers fileExistHandler, string filePath, bool createDir, Message message, GraphServiceClient client, CancellationToken cancellationToken)
+    private static async Task<List<Attachments>> DownloadAttachments(Input input, AuthenticationProviders authenticationProviders, Message message, GraphServiceClient client, CancellationToken cancellationToken)
     {
-        if (createDir && !Directory.Exists(filePath))
-            Directory.CreateDirectory(filePath);
+        if (input.CreateDirectory && !Directory.Exists(input.DestinationDirectory))
+            Directory.CreateDirectory(input.DestinationDirectory);
 
         var attachmentsList = new List<Attachments>();
-        var attachments = client.Me.Messages[message.Id].Attachments.GetAsync((requestConfiguration) =>
-        {
-            requestConfiguration.QueryParameters.Expand = new string[] { "microsoft.graph.itemattachment/item" };
-        }, cancellationToken: cancellationToken).Result;
+        AttachmentCollectionResponse attachments = null;
+
+        if (authenticationProviders is AuthenticationProviders.UsernamePassword)
+            attachments = client.Me.Messages[message.Id].Attachments.GetAsync((requestConfiguration) =>
+            {
+                requestConfiguration.QueryParameters.Expand = new string[] { "microsoft.graph.itemattachment/item" };
+            }, cancellationToken: cancellationToken).Result;
+        else
+            attachments = client.Users[input.From].Messages[message.Id].Attachments.GetAsync((requestConfiguration) =>
+            {
+                requestConfiguration.QueryParameters.Expand = new string[] { "microsoft.graph.itemattachment/item" };
+            }, cancellationToken: cancellationToken).Result;
 
         foreach (var attachment in attachments.Value)
         {
             if (attachment is FileAttachment fileAttachment)
             {
-                var createFileFromBytes = await CreateFileFromBytes(fileExistHandler, fileAttachment.ContentBytes, Path.Combine(filePath, fileAttachment.Name), cancellationToken);
+                var createFileFromBytes = await CreateFileFromBytes(input.FileExistHandler, fileAttachment.ContentBytes, Path.Combine(input.DestinationDirectory, fileAttachment.Name), cancellationToken);
                 attachmentsList.Add(new Attachments()
                 {
                     Id = fileAttachment.Id,
@@ -201,7 +207,7 @@ public class Exchange
                     {
                         var itemAsFileAttachment = innerAttachment as FileAttachment;
                         var itemBytes = itemAsFileAttachment.ContentBytes;
-                        var createFileFromBytes = await CreateFileFromBytes(fileExistHandler, itemBytes, Path.Combine(filePath, innerAttachment.Name), cancellationToken);
+                        var createFileFromBytes = await CreateFileFromBytes(input.FileExistHandler, itemBytes, Path.Combine(input.DestinationDirectory, innerAttachment.Name), cancellationToken);
 
                         attachmentsList.Add(new Attachments()
                         {
@@ -267,11 +273,11 @@ public class Exchange
         return filePath;
     }
 
-    private static async Task UpdateMessageRead(string from, string messageId, GraphServiceClient client, CancellationToken cancellationToken)
+    private static async Task UpdateMessageRead(AuthenticationProviders authenticationProviders, string from, string messageId, GraphServiceClient client, CancellationToken cancellationToken)
     {
         var requestBody = new Message { IsRead = true };
 
-        if (string.IsNullOrWhiteSpace(from))
+        if (authenticationProviders is AuthenticationProviders.UsernamePassword)
             await client.Me.Messages[messageId].PatchAsync(requestBody, cancellationToken: cancellationToken);
         else
             await client.Users[from].Messages[messageId].PatchAsync(requestBody, cancellationToken: cancellationToken);

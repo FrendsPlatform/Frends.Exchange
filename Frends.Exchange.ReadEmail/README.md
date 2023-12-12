@@ -1,5 +1,5 @@
 # Frends.Exchange.ReadEmail
-Frends Task for reading Microsoft Exchange emails and downloading their attachments
+Frends Task for reading Microsoft Exchange emails and downloading their attachments.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) 
 [![Build](https://github.com/FrendsPlatform/Frends.Exchange/actions/workflows/ReadEmail_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Exchange/actions)
