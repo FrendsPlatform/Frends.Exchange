@@ -30,7 +30,7 @@ public class Exchange
     /// <param name="input">Email content</param>
     /// <param name="options">Options for controlling the behavior of this Task.</param>
     /// <param name="cancellationToken">Token received from Frends to cancel this Task.</param>
-    /// <returns>Object { bool Success, List&lt;ResultObject&gt; Data, List&lt;dynamic&gt; ErrorMessage }</returns>
+    /// <returns>Object { bool Success, List&lt;ResultObject&gt; Data, List&lt;dynamic&gt; ErrorMessages }</returns>
     public static async Task<Result> ReadEmail([PropertyTab] Connection connection, [PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         var resultList = new List<ResultObject>();
