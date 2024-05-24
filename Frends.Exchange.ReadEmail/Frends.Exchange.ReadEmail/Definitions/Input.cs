@@ -30,8 +30,8 @@ public class Input
     /// Skip the first n items.
     /// </summary>
     /// <example>10</example>
-    [DefaultValue(0)]
-    public int Skip { get; set; }
+    [DefaultValue(null)]
+    public int? Skip { get; set; }
 
     /// <summary>
     /// Limits the result to the first n items. If set to 0, all items are returned.
