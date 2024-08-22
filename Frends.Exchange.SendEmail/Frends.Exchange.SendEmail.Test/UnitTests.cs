@@ -130,7 +130,7 @@ public class UnitTests
     public async Task SendEmailTest_NordicLetters_UsernamePassword()
     {
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_NordicLetters_UsernamePassword";
-        _input.Message = "T�m� testimaili tuo y�ll� �lannista.";
+        _input.Message = "Tämä testimaili tuo yöllä ålannista.";
         var result = await Exchange.SendEmail(_connection, _input, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
