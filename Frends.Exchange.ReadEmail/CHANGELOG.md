@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.0] - 2025-10-17
+### Changed
+- Changed ClientSecret to a password property.
+
 ## [1.2.0] - 2024-08-22
 ### Changed
 - Updated the Azure.Identity, Newtonsoft.Json and Mimekit libraries to their latest versions.

@@ -40,6 +40,7 @@ public class Connection
     /// </example>
     [UIHint(nameof(AuthenticationProvider), "", AuthenticationProviders.ClientCredentialsSecret)]
     [DisplayFormat(DataFormatString = "Text")]
+    [PasswordPropertyText]
     public string ClientSecret { get; set; }
 
     /// <summary>
