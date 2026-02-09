@@ -75,6 +75,9 @@ public class Exchange
                     // Email won't be marked as read without doing it manually
                     if (input.UpdateReadStatus)
                         await UpdateMessageRead(connection.AuthenticationProvider, input.From, message.Id, client, cancellationToken);
+
+                    if (options.DeleteReadEmails)
+                        await DeleteMessage(connection.AuthenticationProvider, input.From, message.Id, client, cancellationToken);
                 }
             }
         }
@@ -147,7 +150,7 @@ public class Exchange
                 requestConfiguration.QueryParameters.Orderby = string.IsNullOrWhiteSpace(input.Orderby) ? null : input.Orderby.Split(new[] { "\", \"" }, StringSplitOptions.None);
                 requestConfiguration.QueryParameters.Expand = string.IsNullOrWhiteSpace(input.Expand) ? null : input.Expand.Split(new[] { "\", \"" }, StringSplitOptions.None);
                 if (input.Headers != null && input.Headers.Length > 0)
-                    foreach (var header in input.Headers)
+                     foreach (var header in input.Headers)
                         requestConfiguration.Headers.Add(header.HeaderName, header.HeaderValues.ToArray());
             }, cancellationToken);
         }
@@ -281,5 +284,13 @@ public class Exchange
             await client.Me.Messages[messageId].PatchAsync(requestBody, cancellationToken: cancellationToken);
         else
             await client.Users[from].Messages[messageId].PatchAsync(requestBody, cancellationToken: cancellationToken);
+    }
+
+    private static async Task DeleteMessage(AuthenticationProviders authenticationProviders, string from, string messageId, GraphServiceClient client, CancellationToken cancellationToken)
+    {
+        if (authenticationProviders is AuthenticationProviders.UsernamePassword)
+            await client.Me.Messages[messageId].DeleteAsync(cancellationToken: cancellationToken);
+        else
+            await client.Users[from].Messages[messageId].DeleteAsync(cancellationToken: cancellationToken);
     }
 }

@@ -8,6 +8,13 @@ namespace Frends.Exchange.ReadEmail.Definitions;
 public class Options
 {
     /// <summary>
+    /// If true, then received emails will be hard deleted.
+    /// </summary>
+    /// <example>false</example>
+    [DefaultValue(false)]
+    public bool DeleteReadEmails { get; set; } = false;
+
+    /// <summary>
     /// Gets or sets a value indicating whether an error should stop the task and throw an exception.
     /// If set to true, an exception will be thrown when an error occurs. If set to false, Task will try to continue and the error message will be added into Result.ErrorMessages and Result.Success will be set to false.
     /// </summary>

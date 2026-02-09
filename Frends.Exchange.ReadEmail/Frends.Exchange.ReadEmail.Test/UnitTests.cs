@@ -4,6 +4,7 @@ using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -338,6 +339,28 @@ public class UnitTests
         await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
     }
 
+    [TestMethod]
+    public async Task ReadEmailTest_ReadAndDelete()
+    {
+        var testSubject = $"TEST DELETE EMAIL {Guid.NewGuid()}";
+        await SendTestEmail(testSubject);
+
+        await Task.Delay(5000);
+
+        _input.Filter = $"parentFolderId eq 'INBOX' and subject eq '{testSubject}'";
+        _options.DeleteReadEmails = true;
+
+        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.Data.Count, "Should have found exactly one test email");
+        Assert.AreEqual(testSubject, result.Data[0].Subject);
+        Assert.AreEqual(0, result.ErrorMessages.Count);
+
+        _options.DeleteReadEmails = false;
+        var secondRead = await Exchange.ReadEmail(_connection, _input, _options, default);
+        Assert.AreEqual(0, secondRead.Data.Count, "Test email should have been deleted");
+    }
+
     private static GraphServiceClient CreateGraphServiceClient()
     {
         var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
@@ -351,5 +374,40 @@ public class UnitTests
         var client = CreateGraphServiceClient();
         var requestBody = new Message { IsRead = false };
         await client.Me.Messages["AAMkADIxYTJiZDIzLTIyZDMtNDhhNy05YjE1LTY2NGRkNmRjZTNiNwBGAAAAAACTqlZRkDG0S6Jj-VUkGGnxBwBGg69sLcQZTZPbCQVRM7fFAAAAAAEMAABGg69sLcQZTZPbCQVRM7fFAAFJtxHfAAA="].PatchAsync(requestBody);
+    }
+
+    private async Task SendTestEmail(string subject)
+    {
+        var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
+        var credentials = new UsernamePasswordCredential(_user, _password, _tenantID, _applicationID, options);
+        var client = new GraphServiceClient(credentials);
+
+        var message = new Message
+        {
+            Subject = subject,
+            Body = new ItemBody
+            {
+                ContentType = BodyType.Text,
+                Content = "This is a test email for deletion test."
+            },
+            ToRecipients = new List<Recipient>
+            {
+                new Recipient
+                {
+                    EmailAddress = new EmailAddress
+                    {
+                        Address = _user
+                    }
+                }
+            }
+        };
+
+        var requestBody = new Microsoft.Graph.Me.SendMail.SendMailPostRequestBody
+        {
+            Message = message,
+            SaveToSentItems = false
+        };
+
+        await client.Me.SendMail.PostAsync(requestBody);
     }
 }
