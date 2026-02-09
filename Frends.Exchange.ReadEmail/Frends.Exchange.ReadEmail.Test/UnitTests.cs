@@ -33,8 +33,8 @@ public class UnitTests
             Password = _password,
             ClientId = _applicationID,
             TenantId = _tenantID,
-            AuthenticationProvider = AuthenticationProviders.UsernamePassword,
-            ClientSecret = null,
+            AuthenticationProvider = AuthenticationProviders.ClientCredentialsSecret,
+            ClientSecret = _clientSecret,
             X509CertificateFilePath = null,
         };
 
@@ -83,18 +83,6 @@ public class UnitTests
     [TestMethod]
     public async Task ReadEmailTest_ReadAndDownload_Inbox()
     {
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
-        Assert.IsTrue(result.Success);
-        Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
-        Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
-    }
-
-    [TestMethod]
-    public async Task ReadEmailTest_ReadAndDownload_Inbox_ClientCredentialsSecret()
-    {
-        _connection.AuthenticationProvider = AuthenticationProviders.ClientCredentialsSecret;
-        _connection.ClientSecret = _clientSecret;
         var result = await Exchange.ReadEmail(_connection, _input, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
@@ -287,6 +275,8 @@ public class UnitTests
     [TestMethod]
     public async Task ReadEmailTest_MissingCredentials_UsernamePassword_Throw()
     {
+        _connection.AuthenticationProvider = AuthenticationProviders.UsernamePassword;
+
         _connection.TenantId = null;
         await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
 
@@ -364,7 +354,7 @@ public class UnitTests
     private static GraphServiceClient CreateGraphServiceClient()
     {
         var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
-        var credentials = new UsernamePasswordCredential(_user, _password, _tenantID, _applicationID, options);
+        var credentials = new ClientSecretCredential(_tenantID, _applicationID, _clientSecret, options);
         return new GraphServiceClient(credentials);
     }
 
@@ -373,13 +363,13 @@ public class UnitTests
     {
         var client = CreateGraphServiceClient();
         var requestBody = new Message { IsRead = false };
-        await client.Me.Messages["AAMkADIxYTJiZDIzLTIyZDMtNDhhNy05YjE1LTY2NGRkNmRjZTNiNwBGAAAAAACTqlZRkDG0S6Jj-VUkGGnxBwBGg69sLcQZTZPbCQVRM7fFAAAAAAEMAABGg69sLcQZTZPbCQVRM7fFAAFJtxHfAAA="].PatchAsync(requestBody);
+        await client.Users[_user].Messages["AAMkADIxYTJiZDIzLTIyZDMtNDhhNy05YjE1LTY2NGRkNmRjZTNiNwBGAAAAAACTqlZRkDG0S6Jj-VUkGGnxBwBGg69sLcQZTZPbCQVRM7fFAAAAAAEMAABGg69sLcQZTZPbCQVRM7fFAAFJtxHfAAA="].PatchAsync(requestBody);
     }
 
     private async Task SendTestEmail(string subject)
     {
         var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
-        var credentials = new UsernamePasswordCredential(_user, _password, _tenantID, _applicationID, options);
+        var credentials = new ClientSecretCredential(_tenantID, _applicationID, _clientSecret, options);
         var client = new GraphServiceClient(credentials);
 
         var message = new Message
@@ -402,12 +392,12 @@ public class UnitTests
             }
         };
 
-        var requestBody = new Microsoft.Graph.Me.SendMail.SendMailPostRequestBody
+        var requestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
         {
             Message = message,
             SaveToSentItems = false
         };
 
-        await client.Me.SendMail.PostAsync(requestBody);
+        await client.Users[_user].SendMail.PostAsync(requestBody);
     }
 }

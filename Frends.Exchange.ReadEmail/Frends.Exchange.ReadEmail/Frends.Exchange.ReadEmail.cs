@@ -150,7 +150,7 @@ public class Exchange
                 requestConfiguration.QueryParameters.Orderby = string.IsNullOrWhiteSpace(input.Orderby) ? null : input.Orderby.Split(new[] { "\", \"" }, StringSplitOptions.None);
                 requestConfiguration.QueryParameters.Expand = string.IsNullOrWhiteSpace(input.Expand) ? null : input.Expand.Split(new[] { "\", \"" }, StringSplitOptions.None);
                 if (input.Headers != null && input.Headers.Length > 0)
-                     foreach (var header in input.Headers)
+                    foreach (var header in input.Headers)
                         requestConfiguration.Headers.Add(header.HeaderName, header.HeaderValues.ToArray());
             }, cancellationToken);
         }
