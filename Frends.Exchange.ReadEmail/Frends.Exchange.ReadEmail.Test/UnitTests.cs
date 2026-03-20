@@ -19,6 +19,7 @@ public class UnitTests
     private static readonly string? _applicationID = Environment.GetEnvironmentVariable("Exchange_Application_ID");
     private static readonly string? _tenantID = Environment.GetEnvironmentVariable("Exchange_Tenant_ID");
     private static readonly string? _clientSecret = Environment.GetEnvironmentVariable("Exchange_ClientSecret");
+    private const string TestTag = "FRENDS-TEST-MESSAGE";
     private static Connection _connection = new();
     private static Input _input = new();
     private static Options _options = new();
