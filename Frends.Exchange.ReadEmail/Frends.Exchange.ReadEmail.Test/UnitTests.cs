@@ -356,6 +356,21 @@ public class UnitTests
         Assert.AreEqual(0, secondRead.Data.Count, "Test email should have been deleted");
     }
 
+    [TestMethod]
+    public async Task ReadEmailTest_NoThrow_ReturnErrorList()
+    {
+        // Force a failure by providing an invalid TenantId
+        _connection.TenantId = "invalid-guid";
+        _options.ThrowExceptionOnFailure = false;
+
+        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+
+        // This checks the 'else' branch in your catch block
+        Assert.IsFalse(result.Success);
+        Assert.IsTrue(result.ErrorMessages.Count > 0);
+        Assert.AreEqual(0, result.Data.Count);
+    }
+
     private static GraphServiceClient CreateGraphServiceClient()
     {
         var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
@@ -417,7 +432,8 @@ public class UnitTests
         var client = CreateGraphServiceClient();
 
         var messages = await client.Users[_user].Messages
-            .GetAsync(requestConfiguration => {
+            .GetAsync(requestConfiguration =>
+            {
                 requestConfiguration.QueryParameters.Filter = $"contains(subject, '{TestTag}')";
             });
 
