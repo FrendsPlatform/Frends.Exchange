@@ -25,7 +25,7 @@ public class UnitTests
     private static readonly string _downloadDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Download\\");
 
     [TestInitialize]
-    public void Setup()
+    public async Task Setup()
     {
         _connection = new Connection()
         {
@@ -59,13 +59,17 @@ public class UnitTests
         {
             ThrowExceptionOnFailure = true,
         };
+
+        await SeedMailbox(3);
+
+        await Task.Delay(5000);
     }
 
     [TestCleanup]
     public async Task CleanUp()
     {
         if (Directory.Exists(_downloadDir)) Directory.Delete(_downloadDir, true);
-        await UpdateMessageRead();
+        await CleanUpTestEmails();
     }
 
 
@@ -358,19 +362,9 @@ public class UnitTests
         return new GraphServiceClient(credentials);
     }
 
-    // Update message back to unread
-    private static async Task UpdateMessageRead()
-    {
-        var client = CreateGraphServiceClient();
-        var requestBody = new Message { IsRead = false };
-        await client.Users[_user].Messages["AAMkADIxYTJiZDIzLTIyZDMtNDhhNy05YjE1LTY2NGRkNmRjZTNiNwBGAAAAAACTqlZRkDG0S6Jj-VUkGGnxBwBGg69sLcQZTZPbCQVRM7fFAAAAAAEMAABGg69sLcQZTZPbCQVRM7fFAAFJtxHfAAA="].PatchAsync(requestBody);
-    }
-
     private async Task SendTestEmail(string subject)
     {
-        var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
-        var credentials = new ClientSecretCredential(_tenantID, _applicationID, _clientSecret, options);
-        var client = new GraphServiceClient(credentials);
+        var client = CreateGraphServiceClient();
 
         var message = new Message
         {
@@ -378,18 +372,25 @@ public class UnitTests
             Body = new ItemBody
             {
                 ContentType = BodyType.Text,
-                Content = "This is a test email for deletion test."
+                Content = "This is a test email with an attachment to ensure the directory is created."
             },
             ToRecipients = new List<Recipient>
+        {
+            new Recipient
             {
-                new Recipient
-                {
-                    EmailAddress = new EmailAddress
-                    {
-                        Address = _user
-                    }
-                }
+                EmailAddress = new EmailAddress { Address = _user }
             }
+        },
+            Attachments = new List<Attachment>
+        {
+            new FileAttachment
+            {
+                OdataType = "#microsoft.graph.fileAttachment",
+                Name = "test-attachment.txt",
+                ContentType = "text/plain",
+                ContentBytes = System.Text.Encoding.UTF8.GetBytes("Hello World! This is a test attachment.")
+            }
+        }
         };
 
         var requestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
@@ -399,5 +400,32 @@ public class UnitTests
         };
 
         await client.Users[_user].SendMail.PostAsync(requestBody);
+    }
+
+    private async Task SeedMailbox(int count = 1)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            await SendTestEmail($"{TestTag} {Guid.NewGuid()}");
+        }
+        await Task.Delay(2000);
+    }
+
+    private async Task CleanUpTestEmails()
+    {
+        var client = CreateGraphServiceClient();
+
+        var messages = await client.Users[_user].Messages
+            .GetAsync(requestConfiguration => {
+                requestConfiguration.QueryParameters.Filter = $"contains(subject, '{TestTag}')";
+            });
+
+        if (messages?.Value != null)
+        {
+            foreach (var msg in messages.Value)
+            {
+                await client.Users[_user].Messages[msg.Id].DeleteAsync();
+            }
+        }
     }
 }

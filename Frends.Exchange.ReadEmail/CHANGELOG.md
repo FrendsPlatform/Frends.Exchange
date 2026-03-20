@@ -1,7 +1,7 @@
 # Changelog
 
-## [1.4.0] - 2026-02-09
-### Changed
+## [1.4.0] - 2026-03-20
+### Added
 - Added DeleteReadEmails option to permanently delete emails after they are read and processed.
 
 ## [1.3.0] - 2025-10-17
