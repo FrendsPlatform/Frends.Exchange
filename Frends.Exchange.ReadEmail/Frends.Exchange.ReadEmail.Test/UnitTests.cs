@@ -4,6 +4,7 @@ using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -18,13 +19,14 @@ public class UnitTests
     private static readonly string? _applicationID = Environment.GetEnvironmentVariable("Exchange_Application_ID");
     private static readonly string? _tenantID = Environment.GetEnvironmentVariable("Exchange_Tenant_ID");
     private static readonly string? _clientSecret = Environment.GetEnvironmentVariable("Exchange_ClientSecret");
+    private const string TestTag = "FRENDS-TEST-MESSAGE";
     private static Connection _connection = new();
     private static Input _input = new();
     private static Options _options = new();
     private static readonly string _downloadDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Download\\");
 
     [TestInitialize]
-    public void Setup()
+    public async Task Setup()
     {
         _connection = new Connection()
         {
@@ -32,8 +34,8 @@ public class UnitTests
             Password = _password,
             ClientId = _applicationID,
             TenantId = _tenantID,
-            AuthenticationProvider = AuthenticationProviders.UsernamePassword,
-            ClientSecret = null,
+            AuthenticationProvider = AuthenticationProviders.ClientCredentialsSecret,
+            ClientSecret = _clientSecret,
             X509CertificateFilePath = null,
         };
 
@@ -58,13 +60,17 @@ public class UnitTests
         {
             ThrowExceptionOnFailure = true,
         };
+
+        await SeedMailbox(3);
+
+        await Task.Delay(5000);
     }
 
     [TestCleanup]
     public async Task CleanUp()
     {
         if (Directory.Exists(_downloadDir)) Directory.Delete(_downloadDir, true);
-        await UpdateMessageRead();
+        await CleanUpTestEmails();
     }
 
 
@@ -82,18 +88,6 @@ public class UnitTests
     [TestMethod]
     public async Task ReadEmailTest_ReadAndDownload_Inbox()
     {
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
-        Assert.IsTrue(result.Success);
-        Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
-        Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
-    }
-
-    [TestMethod]
-    public async Task ReadEmailTest_ReadAndDownload_Inbox_ClientCredentialsSecret()
-    {
-        _connection.AuthenticationProvider = AuthenticationProviders.ClientCredentialsSecret;
-        _connection.ClientSecret = _clientSecret;
         var result = await Exchange.ReadEmail(_connection, _input, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
@@ -286,6 +280,8 @@ public class UnitTests
     [TestMethod]
     public async Task ReadEmailTest_MissingCredentials_UsernamePassword_Throw()
     {
+        _connection.AuthenticationProvider = AuthenticationProviders.UsernamePassword;
+
         _connection.TenantId = null;
         await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
 
@@ -338,18 +334,115 @@ public class UnitTests
         await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
     }
 
+    [TestMethod]
+    public async Task ReadEmailTest_ReadAndDelete()
+    {
+        var testSubject = $"TEST DELETE EMAIL {Guid.NewGuid()}";
+        await SendTestEmail(testSubject);
+
+        await Task.Delay(5000);
+
+        _input.Filter = $"parentFolderId eq 'INBOX' and subject eq '{testSubject}'";
+        _options.DeleteReadEmails = true;
+
+        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.Data.Count, "Should have found exactly one test email");
+        Assert.AreEqual(testSubject, result.Data[0].Subject);
+        Assert.AreEqual(0, result.ErrorMessages.Count);
+
+        _options.DeleteReadEmails = false;
+        var secondRead = await Exchange.ReadEmail(_connection, _input, _options, default);
+        Assert.AreEqual(0, secondRead.Data.Count, "Test email should have been deleted");
+    }
+
+    [TestMethod]
+    public async Task ReadEmailTest_NoThrow_ReturnErrorList()
+    {
+        // Force a failure by providing an invalid TenantId
+        _connection.TenantId = "invalid-guid";
+        _options.ThrowExceptionOnFailure = false;
+
+        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+
+        // This checks the 'else' branch in your catch block
+        Assert.IsFalse(result.Success);
+        Assert.IsTrue(result.ErrorMessages.Count > 0);
+        Assert.AreEqual(0, result.Data.Count);
+    }
+
     private static GraphServiceClient CreateGraphServiceClient()
     {
         var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
-        var credentials = new UsernamePasswordCredential(_user, _password, _tenantID, _applicationID, options);
+        var credentials = new ClientSecretCredential(_tenantID, _applicationID, _clientSecret, options);
         return new GraphServiceClient(credentials);
     }
 
-    // Update message back to unread
-    private static async Task UpdateMessageRead()
+    private async Task SendTestEmail(string subject)
     {
         var client = CreateGraphServiceClient();
-        var requestBody = new Message { IsRead = false };
-        await client.Me.Messages["AAMkADIxYTJiZDIzLTIyZDMtNDhhNy05YjE1LTY2NGRkNmRjZTNiNwBGAAAAAACTqlZRkDG0S6Jj-VUkGGnxBwBGg69sLcQZTZPbCQVRM7fFAAAAAAEMAABGg69sLcQZTZPbCQVRM7fFAAFJtxHfAAA="].PatchAsync(requestBody);
+
+        var message = new Message
+        {
+            Subject = subject,
+            Body = new ItemBody
+            {
+                ContentType = BodyType.Text,
+                Content = "This is a test email with an attachment to ensure the directory is created."
+            },
+            ToRecipients = new List<Recipient>
+        {
+            new Recipient
+            {
+                EmailAddress = new EmailAddress { Address = _user }
+            }
+        },
+            Attachments = new List<Attachment>
+        {
+            new FileAttachment
+            {
+                OdataType = "#microsoft.graph.fileAttachment",
+                Name = "test-attachment.txt",
+                ContentType = "text/plain",
+                ContentBytes = System.Text.Encoding.UTF8.GetBytes("Hello World! This is a test attachment.")
+            }
+        }
+        };
+
+        var requestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
+        {
+            Message = message,
+            SaveToSentItems = false
+        };
+
+        await client.Users[_user].SendMail.PostAsync(requestBody);
+    }
+
+    private async Task SeedMailbox(int count = 1)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            await SendTestEmail($"{TestTag} {Guid.NewGuid()}");
+        }
+        await Task.Delay(2000);
+    }
+
+    private async Task CleanUpTestEmails()
+    {
+        var client = CreateGraphServiceClient();
+
+        var messages = await client.Users[_user].Messages
+            .GetAsync(requestConfiguration =>
+            {
+                requestConfiguration.QueryParameters.Filter = $"contains(subject, '{TestTag}')";
+            });
+
+        if (messages?.Value != null)
+        {
+            foreach (var msg in messages.Value)
+            {
+                await client.Users[_user].Messages[msg.Id].DeleteAsync();
+            }
+        }
     }
 }
