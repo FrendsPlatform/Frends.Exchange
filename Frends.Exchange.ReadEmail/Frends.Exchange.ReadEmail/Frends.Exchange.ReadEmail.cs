@@ -51,7 +51,7 @@ public class Exchange
                         Id = message.Id,
                         ParentFolderId = message.ParentFolderId,
                         From = message.From?.EmailAddress?.Address,
-                        Mailbox = !string.IsNullOrWhiteSpace(connection.Mailbox) ? connection.Mailbox : input.From,
+                        Mailbox = !string.IsNullOrWhiteSpace(connection.Mailbox) ? connection.Mailbox : !string.IsNullOrWhiteSpace(input.From) ? input.From : connection.Username,
                         Sender = message.Sender?.EmailAddress?.Address,
                         ToRecipients = message.ToRecipients?.Where(r => r != null && r.EmailAddress != null).Select(r => r.EmailAddress.Address).ToList(),
                         CcRecipients = message.CcRecipients?.Where(r => r != null && r.EmailAddress != null).Select(r => r.EmailAddress.Address).ToList(),
@@ -73,12 +73,14 @@ public class Exchange
 
                     resultList.Add(resultObject);
 
+                    var resolvedMailbox = ResolveMailbox(connection, input);
+
                     // Email won't be marked as read without doing it manually
                     if (input.UpdateReadStatus)
-                        await UpdateMessageRead(connection.AuthenticationProvider, input.From, message.Id, client, connection.Mailbox, cancellationToken);
+                        await UpdateMessageRead(connection.AuthenticationProvider, resolvedMailbox, message.Id, client, cancellationToken);
 
                     if (options.DeleteReadEmails)
-                        await DeleteMessage(connection.AuthenticationProvider, input.From, message.Id, client, connection.Mailbox, cancellationToken);
+                        await DeleteMessage(connection.AuthenticationProvider, resolvedMailbox, message.Id, client, cancellationToken);
                 }
             }
         }
@@ -143,7 +145,7 @@ public class Exchange
         var useMe = authenticationProviders is AuthenticationProviders.UsernamePassword
             && string.IsNullOrWhiteSpace(connection.Mailbox);
 
-        var mailbox = !string.IsNullOrWhiteSpace(connection.Mailbox) ? connection.Mailbox : input.From;
+        var mailbox = ResolveMailbox(connection, input);
 
         if (useMe)
         {
@@ -186,7 +188,7 @@ public class Exchange
         var useMe = connection.AuthenticationProvider is AuthenticationProviders.UsernamePassword
                && string.IsNullOrWhiteSpace(connection.Mailbox);
 
-        var mailbox = !string.IsNullOrWhiteSpace(connection.Mailbox) ? connection.Mailbox : input.From;
+        var mailbox = ResolveMailbox(connection, input);
 
         if (useMe)
             attachments = client.Me.Messages[message.Id].Attachments.GetAsync((requestConfiguration) =>
@@ -287,31 +289,42 @@ public class Exchange
         return filePath;
     }
 
-    private static async Task UpdateMessageRead(AuthenticationProviders authenticationProviders, string from, string messageId, GraphServiceClient client, string mailbox, CancellationToken cancellationToken)
+    private static async Task UpdateMessageRead(AuthenticationProviders authenticationProviders, string mailbox, string messageId, GraphServiceClient client, CancellationToken cancellationToken)
     {
         var requestBody = new Message { IsRead = true };
 
         var useMe = authenticationProviders is AuthenticationProviders.UsernamePassword
                     && string.IsNullOrWhiteSpace(mailbox);
 
-        var targetMailbox = !string.IsNullOrWhiteSpace(mailbox) ? mailbox : from;
-
         if (useMe)
             await client.Me.Messages[messageId].PatchAsync(requestBody, cancellationToken: cancellationToken);
         else
-            await client.Users[targetMailbox].Messages[messageId].PatchAsync(requestBody, cancellationToken: cancellationToken);
+            await client.Users[mailbox].Messages[messageId].PatchAsync(requestBody, cancellationToken: cancellationToken);
     }
 
-    private static async Task DeleteMessage(AuthenticationProviders authenticationProviders, string from, string messageId, GraphServiceClient client, string mailbox, CancellationToken cancellationToken)
+    private static async Task DeleteMessage(AuthenticationProviders authenticationProviders, string mailbox, string messageId, GraphServiceClient client, CancellationToken cancellationToken)
     {
         var useMe = authenticationProviders is AuthenticationProviders.UsernamePassword
                     && string.IsNullOrWhiteSpace(mailbox);
 
-        var targetMailbox = !string.IsNullOrWhiteSpace(mailbox) ? mailbox : from;
-
         if (useMe)
             await client.Me.Messages[messageId].DeleteAsync(cancellationToken: cancellationToken);
         else
-            await client.Users[targetMailbox].Messages[messageId].DeleteAsync(cancellationToken: cancellationToken);
+            await client.Users[mailbox].Messages[messageId].DeleteAsync(cancellationToken: cancellationToken);
+    }
+
+    private static string ResolveMailbox(Connection connection, Input input)
+    {
+        if (!string.IsNullOrWhiteSpace(connection.Mailbox))
+            return connection.Mailbox;
+
+        if (connection.AuthenticationProvider == AuthenticationProviders.UsernamePassword)
+            return connection.Username;
+
+        if (!string.IsNullOrWhiteSpace(input.From))
+            return input.From;
+
+        throw new ArgumentNullException(nameof(connection.Mailbox),
+        "Mailbox is required for client-credentials authentication when Input.From is not provided.");
     }
 }

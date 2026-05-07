@@ -83,8 +83,8 @@ public class Connection
 
     /// <summary>
     /// Mailbox from where the emails will be read.
-    /// If empty and using UsernamePassword authentication, the username will be used as mailbox.
-    /// Required when using ClientCredentials authentication.
+    /// If empty and using UsernamePassword authentication, the authenticated user's mailbox will be used.
+    /// If empty and using ClientCredentials authentication, Input.From will be used as fallback.
     /// </summary>
     /// <example>johndoe@example.com</example>
     [DefaultValue("")]
