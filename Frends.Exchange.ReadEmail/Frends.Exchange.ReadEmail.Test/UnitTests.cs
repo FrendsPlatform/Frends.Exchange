@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Frends.Exchange.ReadEmail.Tests;
@@ -369,6 +370,18 @@ public class UnitTests
         Assert.IsFalse(result.Success);
         Assert.IsTrue(result.ErrorMessages.Count > 0);
         Assert.AreEqual(0, result.Data.Count);
+    }
+
+    [TestMethod]
+    public async Task ReadEmailTest_ReadAndDownload_Inbox_WithMailbox_ClientCredentialsSecret()
+    {
+        _connection.Mailbox = _user;
+        _input.From = null;
+        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        Assert.IsTrue(result.Success);
+        Assert.IsTrue(result.Data.Count > 0);
+        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsTrue(result.Data.All(x => x.Mailbox == _user));
     }
 
     private static GraphServiceClient CreateGraphServiceClient()

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.5.0] - 2026-05-07
+### Added
+- Added `Mailbox` parameter to `Connection` to allow reading emails from a mailbox different than the authenticated user. 
+  For `UsernamePassword` authentication, if `Mailbox` is empty, the authenticated user's mailbox is used. For `ClientCredentials` authentication, if `Mailbox` is empty, `Input.From` is used as fallback.
+
 ## [1.4.0] - 2026-03-20
 ### Added
 - Added DeleteReadEmails option to permanently delete emails after they are read and processed.
