@@ -20,6 +20,12 @@ public class ResultObject
     public string ParentFolderId { get; set; }
 
     /// <summary>
+    /// The mailbox from which the email was read.
+    /// </summary>
+    /// <example>johndoe@example.com</example>
+    public string Mailbox { get; set; }
+
+    /// <summary>
     /// From email address.
     /// </summary>
     /// <example>johndoe@example.com</example>

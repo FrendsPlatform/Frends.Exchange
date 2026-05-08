@@ -80,4 +80,14 @@ public class Connection
     /// 9188040d-6c67-4c5b-b112-36a304b66dad
     /// </example>
     public string TenantId { get; set; }
+
+    /// <summary>
+    /// Mailbox from where the emails will be read.
+    /// If empty and using UsernamePassword authentication, the authenticated user's mailbox will be used.
+    /// If empty and using ClientCredentials authentication, Input.From will be used as fallback.
+    /// </summary>
+    /// <example>johndoe@example.com</example>
+    [DefaultValue("")]
+    [DisplayFormat(DataFormatString = "Text")]
+    public string Mailbox { get; set; } = string.Empty;
 }
