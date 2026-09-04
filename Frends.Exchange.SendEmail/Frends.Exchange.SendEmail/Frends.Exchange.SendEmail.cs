@@ -1,5 +1,6 @@
 ﻿using Azure.Identity;
 using Frends.Exchange.SendEmail.Definitions;
+using Frends.Exchange.SendEmail.Helpers;
 using Microsoft.Graph;
 using Microsoft.Graph.Me.SendMail;
 using Microsoft.Graph.Models;
@@ -17,7 +18,7 @@ namespace Frends.Exchange.SendEmail;
 /// <summary>
 /// Microsoft Exchange Task.
 /// </summary>
-public class Exchange
+public static class Exchange
 {
     /// <summary>
     /// List of temp files to be deleted.
@@ -28,12 +29,12 @@ public class Exchange
     /// Send a Microsoft Exchange email.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Exchange.SendEmail)
     /// </summary>
-    /// <param name="connection">Parameters for establishing a connection.</param>
     /// <param name="input">Email content</param>
+    /// <param name="connection">Parameters for establishing a connection.</param>
     /// <param name="options">Options for controlling the behavior of this Task.</param>
     /// <param name="cancellationToken">Token received from Frends to cancel this Task.</param>
-    /// <returns>Object { bool Success, string Data }</returns>
-    public static async Task<Result> SendEmail([PropertyTab] Connection connection, [PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
+    /// <returns>Object { bool Success, string Data, Error Error }</returns>
+    public static async Task<Result> SendEmail([PropertyTab] Input input, [PropertyTab] Connection connection, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         InputCheck(connection, input);
         return await SendExchangeEmail(input, connection, options, cancellationToken);
@@ -286,10 +287,7 @@ public class Exchange
         }
         catch (Exception ex)
         {
-            if (options.ThrowExceptionOnFailure)
-                throw;
-
-            return new Result(false, $"Failed to send an email. {ex.Message}");
+            return ex.Handle(options);
         }
     }
 }

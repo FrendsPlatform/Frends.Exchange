@@ -56,7 +56,7 @@ public class UnitTests
         _options = new Options()
         {
             ThrowExceptionIfAttachmentNotFound = true,
-            ThrowExceptionOnFailure = true,
+            ThrowErrorOnFailure = true,
         };
     }
 
@@ -70,7 +70,7 @@ public class UnitTests
     public async Task SendEmailTest_PlainText_UsernamePassword()
     {
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_PlainText_UsernamePassword";
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
@@ -80,7 +80,7 @@ public class UnitTests
     {
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_ToMultiple_Semicolon_UsernamePassword";
         _input.To = $"{_user}; {_user2}";
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
@@ -90,7 +90,7 @@ public class UnitTests
     {
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_ToMultiple_Comma_UsernamePassword";
         _input.To = $"{_user}; {_user2}";
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
@@ -100,7 +100,7 @@ public class UnitTests
     {
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_WithCC_UsernamePassword";
         _input.Cc = $"{_user}; {_user2}";
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
@@ -110,7 +110,7 @@ public class UnitTests
     {
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_WithBCC_UsernamePassword";
         _input.Bcc = $"{_user}; {_user2}";
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
@@ -121,7 +121,7 @@ public class UnitTests
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_Html_UsernamePassword";
         _input.Message = "<div><h1>This is a header text.</h1></div>";
         _input.IsMessageHtml = true;
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
@@ -131,7 +131,7 @@ public class UnitTests
     {
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_NordicLetters_UsernamePassword";
         _input.Message = "Tämä testimaili tuo yöllä ålannista.";
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
@@ -149,7 +149,7 @@ public class UnitTests
             }
         };
 
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual($"Email sent successfully.", result.Data);
     }
@@ -173,7 +173,7 @@ public class UnitTests
             }
         };
 
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual($"Email sent successfully.", result.Data);
     }
@@ -191,7 +191,7 @@ public class UnitTests
             }
         };
 
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual($"Email sent successfully.", result.Data);
     }
@@ -210,7 +210,7 @@ public class UnitTests
             }
         };
 
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual($"Email sent successfully.", result.Data);
     }
@@ -235,7 +235,7 @@ public class UnitTests
             }
         };
 
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual($"Email sent successfully.", result.Data);
     }
@@ -254,7 +254,7 @@ public class UnitTests
             }
         };
 
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual($"Email sent successfully.", result.Data);
     }
@@ -279,7 +279,7 @@ public class UnitTests
             }
         };
 
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual($"Email sent successfully.", result.Data);
     }
@@ -304,7 +304,7 @@ public class UnitTests
             }
         };
 
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual($"Email sent successfully.", result.Data);
     }
@@ -318,7 +318,7 @@ public class UnitTests
     {
         _input.From = _user2;
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_SendEmailAsAnotherUser_UsernamePassword";
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
     }
 
@@ -326,26 +326,26 @@ public class UnitTests
     public async Task SendEmailTest_MissingTo_Throw()
     {
         _input.To = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
     }
 
     [TestMethod]
     public async Task SendEmailTest_MissingCredentials_UsernamePassword_Throw()
     {
         _connection.TenantId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
 
         _connection.TenantId = _tenantID;
         _connection.ClientId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
 
         _connection.ClientId = _applicationID;
         _connection.Username = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
 
         _connection.Username = _user;
         _connection.Password = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
     }
 
     [TestMethod]
@@ -355,15 +355,15 @@ public class UnitTests
 
         _connection.X509CertificateFilePath = "Something";
         _connection.TenantId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
 
         _connection.TenantId = _tenantID;
         _connection.ClientId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
 
         _connection.ClientId = _applicationID;
         _connection.X509CertificateFilePath = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
     }
 
     [TestMethod]
@@ -373,15 +373,15 @@ public class UnitTests
 
         _connection.ClientSecret = "Something";
         _connection.TenantId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
 
         _connection.TenantId = _tenantID;
         _connection.ClientId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
 
         _connection.ClientId = _applicationID;
         _connection.ClientSecret = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
     }
 
     [TestMethod]
@@ -396,12 +396,14 @@ public class UnitTests
                 FileMask = "*.*"
             }
         };
-        _options.ThrowExceptionOnFailure = false;
+        _options.ThrowErrorOnFailure = false;
         _options.ThrowExceptionIfAttachmentNotFound = true;
 
-        var result = await Exchange.SendEmail(_connection, _input, _options, default);
+        var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsFalse(result.Success);
         Assert.AreEqual("Failed to send an email. No files found in directory C:\\nothinghere.", result.Data);
+        Assert.IsNotNull(result.Error);
+        Assert.AreEqual("No files found in directory C:\\nothinghere.", result.Error.Message);
     }
 
     [TestMethod]
@@ -416,9 +418,29 @@ public class UnitTests
                 FileMask = "*.*"
             }
         };
-        _options.ThrowExceptionOnFailure = true;
+        _options.ThrowErrorOnFailure = true;
         _options.ThrowExceptionIfAttachmentNotFound = true;
-        await Assert.ThrowsExceptionAsync<Exception>(async () => await Exchange.SendEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<Exception>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
+    }
+
+    [TestMethod]
+    public async Task SendEmailTest_FileNotFound_CustomErrorMessage()
+    {
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_ReceiverNotFound";
+        _input.Attachments = new[] {
+            new Attachments()
+            {
+                AttachmentType = AttachmentTypes.FileAttachment,
+                FilePath = @"C:\nothinghere",
+                FileMask = "*.*"
+            }
+        };
+        _options.ThrowErrorOnFailure = true;
+        _options.ThrowExceptionIfAttachmentNotFound = true;
+        _options.ErrorMessageOnFailure = "Custom error message";
+
+        var ex = await Assert.ThrowsExceptionAsync<Exception>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
+        StringAssert.Contains(ex.Message, "Custom error message");
     }
 
     internal static void CreateFiles()

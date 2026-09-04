@@ -17,6 +17,7 @@ public class Connection
     /// - `AuthenticationProviders.ClientCredentialsCertificate`: Uses a client certificate and private key to authenticate.
     /// - `AuthenticationProviders.ClientCredentialsSecret`: Uses a client secret to authenticate.
     /// </remarks>
+    /// <example>AuthenticationProviders.UsernamePassword</example>
     [DefaultValue(AuthenticationProviders.UsernamePassword)]
     public AuthenticationProviders AuthenticationProvider { get; set; }
 

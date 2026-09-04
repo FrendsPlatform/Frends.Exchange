@@ -12,14 +12,21 @@ public class Result
     public bool Success { get; private set; }
 
     /// <summary>
-    /// Gets the result of the task. Contains exception message if exception was thrown and Options.ThrowExceptionOnFailure = false.
+    /// Gets the result of the task. Contains exception message if exception was thrown and Options.ThrowErrorOnFailure = false.
     /// </summary>
     /// <example>Email sent successfully.</example>
     public string Data { get; private set; }
 
-    internal Result(bool success, string data)
+    /// <summary>
+    /// Gets the error details of the task. Null when Success is true.
+    /// </summary>
+    /// <example>null</example>
+    public Error Error { get; private set; }
+
+    internal Result(bool success, string data, Error error = null)
     {
         Success = success;
         Data = data;
+        Error = error;
     }
 }
