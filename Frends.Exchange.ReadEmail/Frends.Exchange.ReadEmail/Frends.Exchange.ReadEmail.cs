@@ -1,5 +1,6 @@
 ﻿using Azure.Identity;
 using Frends.Exchange.ReadEmail.Definitions;
+using Frends.Exchange.ReadEmail.Helpers;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using System;
@@ -15,7 +16,7 @@ namespace Frends.Exchange.ReadEmail;
 /// <summary>
 /// Microsoft Exchange Task.
 /// </summary>
-public class Exchange
+public static class Exchange
 {
     /// <summary>
     /// List of temp files to be deleted.
@@ -26,15 +27,14 @@ public class Exchange
     /// Read Microsoft Exchange emails and downloading their attachments.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Exchange.ReadEmail)
     /// </summary>
-    /// <param name="connection">Parameters for establishing a connection.</param>
     /// <param name="input">Email content</param>
+    /// <param name="connection">Parameters for establishing a connection.</param>
     /// <param name="options">Options for controlling the behavior of this Task.</param>
     /// <param name="cancellationToken">Token received from Frends to cancel this Task.</param>
-    /// <returns>Object { bool Success, List&lt;ResultObject&gt; Data, List&lt;dynamic&gt; ErrorMessages }</returns>
-    public static async Task<Result> ReadEmail([PropertyTab] Connection connection, [PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
+    /// <returns>Object { bool Success, List&lt;ResultObject&gt; Data, Error Error }</returns>
+    public static async Task<Result> ReadEmail([PropertyTab] Input input, [PropertyTab] Connection connection, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         var resultList = new List<ResultObject>();
-        var errors = new List<dynamic>();
 
         try
         {
@@ -86,13 +86,10 @@ public class Exchange
         }
         catch (Exception ex)
         {
-            if (options.ThrowExceptionOnFailure)
-                throw;
-            else
-                errors.Add(ex);
+            return ex.Handle(options, resultList);
         }
 
-        return new Result(errors.Count <= 0, resultList, errors);
+        return new Result(true, resultList);
     }
 
     private static void InputCheck(Connection connection, Input input)

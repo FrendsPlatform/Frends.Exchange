@@ -14,21 +14,21 @@ public class Result
     public bool Success { get; private set; }
 
     /// <summary>
-    /// Gets the result of the task. Contains exception message if exception was thrown and Options.ThrowExceptionOnFailure = false.
+    /// Gets the result of the task. Contains exception message if exception was thrown and Options.ThrowErrorOnFailure = false.
     /// </summary>
     /// <example>{ "AAMkADIxYTJiZDIz", "C:\temp\file.txt", 6000, "#microsoft.graph.fileAttachment", "This is content." }</example>
     public List<ResultObject> Data { get; private set; }
 
     /// <summary>
-    /// Error messages.
+    /// Error details. Null when Success is true.
     /// </summary>
-    /// <example>{ "error occured", "another error occured." }</example>
-    public List<dynamic> ErrorMessages { get; private set; }
+    /// <example>null</example>
+    public Error Error { get; private set; }
 
-    internal Result(bool success, List<ResultObject> data, List<dynamic> errorMessage)
+    internal Result(bool success, List<ResultObject> data, Error error = null)
     {
         Success = success;
         Data = data;
-        ErrorMessages = errorMessage;
+        Error = error;
     }
 }

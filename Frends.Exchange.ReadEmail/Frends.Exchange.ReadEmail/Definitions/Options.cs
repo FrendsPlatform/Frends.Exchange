@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Exchange.ReadEmail.Definitions;
 
@@ -16,9 +17,17 @@ public class Options
 
     /// <summary>
     /// Gets or sets a value indicating whether an error should stop the task and throw an exception.
-    /// If set to true, an exception will be thrown when an error occurs. If set to false, Task will try to continue and the error message will be added into Result.ErrorMessages and Result.Success will be set to false.
+    /// If set to true, an exception will be thrown when an error occurs. If set to false, Task will try to continue and the error will be added into Result.Error and Result.Success will be set to false.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
-    public bool ThrowExceptionOnFailure { get; set; }
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message on failure. If `ThrowErrorOnFailure` is set to `true`, then the original exception will be wrapped in a new Exception with this error message.
+    /// </summary>
+    /// <example>Reading emails from mailbox failed: connection could not be established</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
 }
