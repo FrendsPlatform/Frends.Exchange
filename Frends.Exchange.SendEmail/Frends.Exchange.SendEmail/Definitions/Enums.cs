@@ -17,7 +17,7 @@ public enum AttachmentTypes
 }
 
 /// <summary>
-/// /// Importance level options.
+/// Importance level options.
 /// </summary>
 public enum ImportanceLevels
 {
