@@ -201,7 +201,6 @@ public class UnitTests
     public async Task SendEmailTest_LargeAttachment_ClientCredentialsSecret()
     {
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_LargeAttachment_ClientCredentialsSecret";
-        _input.From = null;
         _input.Attachments = new[] {
             new Attachments()
             {
@@ -220,7 +219,6 @@ public class UnitTests
     public async Task SendEmailTest_MultipleLargeAttachments_ClientCredentialsSecret()
     {
         _input.Subject = $"{_input.Subject}, Method: SendEmailTest_MultipleLargeAttachments_ClientCredentialsSecret";
-        _input.From = null;
         _input.Attachments = new[] {
             new Attachments()
             {
