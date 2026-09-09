@@ -14,6 +14,7 @@ public class UnitTests
     private readonly string? _password = Environment.GetEnvironmentVariable("Exchange_User_Password");
     private readonly string? _applicationID = Environment.GetEnvironmentVariable("Exchange_Application_ID");
     private readonly string? _tenantID = Environment.GetEnvironmentVariable("Exchange_Tenant_ID");
+    private static readonly string? _clientSecret = Environment.GetEnvironmentVariable("Exchange_ClientSecret");
     private static Connection _connection = new();
     private static Input _input = new();
     private static Options _options = new();
@@ -34,8 +35,8 @@ public class UnitTests
             Password = _password,
             ClientId = _applicationID,
             TenantId = _tenantID,
-            AuthenticationProvider = AuthenticationProviders.UsernamePassword,
-            ClientSecret = null,
+            AuthenticationProvider = AuthenticationProviders.ClientCredentialsSecret,
+            ClientSecret = _clientSecret,
             X509CertificateFilePath = null,
         };
 
@@ -67,18 +68,18 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_PlainText_UsernamePassword()
+    public async Task SendEmailTest_PlainText_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_PlainText_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_PlainText_ClientCredentialsSecret";
         var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
 
     [TestMethod]
-    public async Task SendEmailTest_ToMultiple_Semicolon_UsernamePassword()
+    public async Task SendEmailTest_ToMultiple_Semicolon_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_ToMultiple_Semicolon_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_ToMultiple_Semicolon_ClientCredentialsSecret";
         _input.To = $"{_user}; {_user2}";
         var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
@@ -86,39 +87,39 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_ToMultiple_Comma_UsernamePassword()
+    public async Task SendEmailTest_ToMultiple_Comma_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_ToMultiple_Comma_UsernamePassword";
-        _input.To = $"{_user}; {_user2}";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_ToMultiple_Comma_ClientCredentialsSecret";
+        _input.To = $"{_user}, {_user2}";
         var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
 
     [TestMethod]
-    public async Task SendEmailTest_WithCC_UsernamePassword()
+    public async Task SendEmailTest_WithCC_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_WithCC_UsernamePassword";
-        _input.Cc = $"{_user}; {_user2}";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_WithCC_ClientCredentialsSecret";
+        _input.Cc = $"{_user}, {_user2}";
         var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
 
     [TestMethod]
-    public async Task SendEmailTest_WithBCC_UsernamePassword()
+    public async Task SendEmailTest_WithBCC_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_WithBCC_UsernamePassword";
-        _input.Bcc = $"{_user}; {_user2}";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_WithBCC_ClientCredentialsSecret";
+        _input.Bcc = $"{_user}, {_user2}";
         var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual("Email sent successfully.", result.Data);
     }
 
     [TestMethod]
-    public async Task SendEmailTest_Html_UsernamePassword()
+    public async Task SendEmailTest_Html_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_Html_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_Html_ClientCredentialsSecret";
         _input.Message = "<div><h1>This is a header text.</h1></div>";
         _input.IsMessageHtml = true;
         var result = await Exchange.SendEmail(_input, _connection, _options, default);
@@ -127,9 +128,9 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_NordicLetters_UsernamePassword()
+    public async Task SendEmailTest_NordicLetters_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_NordicLetters_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_NordicLetters_ClientCredentialsSecret";
         _input.Message = "Tämä testimaili tuo yöllä ålannista.";
         var result = await Exchange.SendEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
@@ -137,9 +138,9 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_SingleFileAttachment_UsernamePassword()
+    public async Task SendEmailTest_SingleFileAttachment_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_SingleFileAttachment_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_SingleFileAttachment_ClientCredentialsSecret";
         _input.Attachments = new[] {
             new Attachments()
             {
@@ -155,9 +156,9 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_MultipleFileAttachment_UsernamePassword()
+    public async Task SendEmailTest_MultipleFileAttachment_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_MultipleFileAttachment_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_MultipleFileAttachment_ClientCredentialsSecret";
         _input.Attachments = new[] {
             new Attachments()
             {
@@ -179,9 +180,9 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_SingleFileFromDir_UsernamePassword()
+    public async Task SendEmailTest_SingleFileFromDir_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_SingleFileFromDir_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_SingleFileFromDir_ClientCredentialsSecret";
         _input.Attachments = new[] {
             new Attachments()
             {
@@ -197,9 +198,9 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_LargeAttachment_UsernamePassword()
+    public async Task SendEmailTest_LargeAttachment_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_LargeAttachment_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_LargeAttachment_ClientCredentialsSecret";
         _input.From = null;
         _input.Attachments = new[] {
             new Attachments()
@@ -216,9 +217,9 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_MultipleLargeAttachments_UsernamePassword()
+    public async Task SendEmailTest_MultipleLargeAttachments_ClientCredentialsSecret()
     {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_MultipleLargeAttachments_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_MultipleLargeAttachments_ClientCredentialsSecret";
         _input.From = null;
         _input.Attachments = new[] {
             new Attachments()
@@ -241,10 +242,10 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_StringAttachment_UsernamePassword()
+    public async Task SendEmailTest_StringAttachment_ClientCredentialsSecret()
     {
 
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_StringAttachment_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_StringAttachment_ClientCredentialsSecret";
         _input.Attachments = new[] {
             new Attachments()
             {
@@ -260,10 +261,10 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_MultipleStringAttachment_UsernamePassword()
+    public async Task SendEmailTest_MultipleStringAttachment_ClientCredentialsSecret()
     {
 
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_MultipleStringAttachment_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_MultipleStringAttachment_ClientCredentialsSecret";
         _input.Attachments = new[] {
             new Attachments()
             {
@@ -285,10 +286,10 @@ public class UnitTests
     }
 
     [TestMethod]
-    public async Task SendEmailTest_MixAttachments_UsernamePassword()
+    public async Task SendEmailTest_MixAttachments_ClientCredentialsSecret()
     {
 
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_MixAttachments_UsernamePassword";
+        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_MixAttachments_ClientCredentialsSecret";
         _input.Attachments = new[] {
             new Attachments()
             {
@@ -332,6 +333,8 @@ public class UnitTests
     [TestMethod]
     public async Task SendEmailTest_MissingCredentials_UsernamePassword_Throw()
     {
+        _connection.AuthenticationProvider = AuthenticationProviders.UsernamePassword;
+
         _connection.TenantId = null;
         await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
 

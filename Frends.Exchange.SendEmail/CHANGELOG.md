@@ -3,6 +3,7 @@
 ## [2.0.0] - 2026-09-04
 ### Changed
 - Target framework updated to .NET 8.
+- Updated the MimeKit version from 4.7.1 to 4.17.0.
 - [Breaking Change] Renamed `Options.ThrowExceptionOnFailure` to `Options.ThrowErrorOnFailure`.
 - [Breaking Change] Updated failure handling behavior, including exception propagation, cancellation handling, and failure message formatting.
 ### Added

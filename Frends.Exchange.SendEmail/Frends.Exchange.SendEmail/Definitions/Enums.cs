@@ -13,10 +13,12 @@ public enum AttachmentTypes
     /// <summary>
     /// Select this if the attachment file should be created from a string. This means the attachment will be created from a string in your code.
     /// </summary>
-    AttachmentFromString
+    AttachmentFromString,
 }
 
-/// Importance level options.
+/// <summary>
+/// /// Importance level options.
+/// </summary>
 public enum ImportanceLevels
 {
     /// <summary>
@@ -32,7 +34,7 @@ public enum ImportanceLevels
     /// <summary>
     /// Select this if the email is of high importance. This might be used for urgent or time-sensitive emails.
     /// </summary>
-    High
+    High,
 }
 
 /// <summary>
@@ -53,5 +55,5 @@ public enum AuthenticationProviders
     /// <summary>
     /// Select this if the authentication should be done using a username and password. This requires the username and password of the user.
     /// </summary>
-    UsernamePassword
+    UsernamePassword,
 }

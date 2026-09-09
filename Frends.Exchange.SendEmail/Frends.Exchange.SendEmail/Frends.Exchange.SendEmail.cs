@@ -1,10 +1,4 @@
-﻿using Azure.Identity;
-using Frends.Exchange.SendEmail.Definitions;
-using Frends.Exchange.SendEmail.Helpers;
-using Microsoft.Graph;
-using Microsoft.Graph.Me.SendMail;
-using Microsoft.Graph.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -12,6 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Identity;
+using Frends.Exchange.SendEmail.Definitions;
+using Frends.Exchange.SendEmail.Helpers;
+using Microsoft.Graph;
+using Microsoft.Graph.Me.SendMail;
+using Microsoft.Graph.Models;
 
 namespace Frends.Exchange.SendEmail;
 
@@ -23,7 +23,7 @@ public static class Exchange
     /// <summary>
     /// List of temp files to be deleted.
     /// </summary>
-    internal static List<string> tempFilePaths = new();
+    private static List<string> tempFilePaths = new();
 
     /// <summary>
     /// Send a Microsoft Exchange email.
@@ -85,7 +85,7 @@ public static class Exchange
 
     private static List<Recipient> GetRecipients(string to)
     {
-        return to.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(receiver => new Recipient { EmailAddress = new EmailAddress { Address = receiver.Replace(" ", "") } }).ToList();
+        return to.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(receiver => new Recipient { EmailAddress = new EmailAddress { Address = receiver.Replace(" ", string.Empty) } }).ToList();
     }
 
     private static Importance GetImportance(ImportanceLevels importance)
@@ -114,8 +114,10 @@ public static class Exchange
         try
         {
             foreach (var file in tempFilePaths)
+            {
                 if (File.Exists(file))
                     File.Delete(file);
+            }
         }
         catch (Exception)
         {
@@ -153,7 +155,9 @@ public static class Exchange
                     }
                     else
                         if (options.ThrowExceptionIfAttachmentNotFound)
-                        throw new Exception($"No files found in directory {attachment.FilePath}.");
+                        {
+                            throw new Exception($"No files found in directory {attachment.FilePath}.");
+                        }
 
                     break;
                 case AttachmentTypes.AttachmentFromString:
@@ -170,7 +174,7 @@ public static class Exchange
         // Upload (large) or prepare attachment (small)
         if (containLargeFile)
         {
-            //Create draft message
+            // Create draft message
             message = string.IsNullOrWhiteSpace(from)
                         ? await client.Me.Messages.PostAsync(message, cancellationToken: cancellationToken)
                         : await client.Users[from].Messages.PostAsync(message, cancellationToken: cancellationToken);
@@ -191,7 +195,7 @@ public static class Exchange
                             AttachmentType = AttachmentType.File,
                             Name = fileName,
                             Size = fileStream.Length,
-                            ContentType = "application/octet-stream"
+                            ContentType = "application/octet-stream",
                         },
                     };
                     uploadSession = await client.Me.Messages[message.Id].Attachments.CreateUploadSession.PostAsync(uploadRequestBody, cancellationToken: cancellationToken);
@@ -205,7 +209,7 @@ public static class Exchange
                             AttachmentType = AttachmentType.File,
                             Name = fileName,
                             Size = fileStream.Length,
-                            ContentType = "application/octet-stream"
+                            ContentType = "application/octet-stream",
                         },
                     };
                     uploadSession = await client.Users[from].Messages[message.Id].Attachments.CreateUploadSession.PostAsync(uploadRequestBody, cancellationToken: cancellationToken);
@@ -232,6 +236,7 @@ public static class Exchange
                     AdditionalData = new Dictionary<string, object> { { "contentBytes", Convert.ToBase64String(littleStream) } },
                 });
             }
+
             message.Attachments = attachmentList;
         }
 
@@ -268,7 +273,9 @@ public static class Exchange
                     await client.Me.SendMail.PostAsync(requestBody, cancellationToken: cancellationToken);
                 }
                 else
+                {
                     await client.Me.Messages[message.Id].Send.PostAsync(cancellationToken: cancellationToken);
+                }
             }
             else
             {
@@ -278,7 +285,9 @@ public static class Exchange
                     await client.Users[input.From].SendMail.PostAsync(userRequestBody, cancellationToken: cancellationToken);
                 }
                 else
+                {
                     await client.Users[input.From].Messages[message.Id].Send.PostAsync(cancellationToken: cancellationToken);
+                }
             }
 
             CleanUpTempFiles();
