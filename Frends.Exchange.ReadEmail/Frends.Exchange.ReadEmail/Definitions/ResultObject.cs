@@ -119,7 +119,7 @@ public class ResultObject
     /// The list of attachments of the message.
     /// </summary>
     /// <example>
-    /// { 
+    /// {
     ///     { "AAMkADIxYTJiZDIz...", "C:\temp\file.txt", 6000, "#microsoft.graph.itemAttachment", "This is content" },
     ///     { "RjZTNiNwBGAAAAaa...", "C:\temp\file2.txt", 6001, "#microsoft.graph.fileAttachment", "#microsoft.graph.itemAttachment" }
     /// }

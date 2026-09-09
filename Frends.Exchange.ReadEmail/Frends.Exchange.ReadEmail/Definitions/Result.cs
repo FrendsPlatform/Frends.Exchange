@@ -7,6 +7,13 @@ namespace Frends.Exchange.ReadEmail.Definitions;
 /// </summary>
 public class Result
 {
+    internal Result(bool success, List<ResultObject> data, Error error = null)
+    {
+        Success = success;
+        Data = data;
+        Error = error;
+    }
+
     /// <summary>
     /// Gets a value indicating whether the task was executed successfully.
     /// </summary>
@@ -24,11 +31,4 @@ public class Result
     /// </summary>
     /// <example>null</example>
     public Error Error { get; private set; }
-
-    internal Result(bool success, List<ResultObject> data, Error error = null)
-    {
-        Success = success;
-        Data = data;
-        Error = error;
-    }
 }

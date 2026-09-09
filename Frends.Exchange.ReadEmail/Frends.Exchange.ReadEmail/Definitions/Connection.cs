@@ -33,7 +33,7 @@ public class Connection
     public string X509CertificateFilePath { get; set; }
 
     /// <summary>
-    /// Specifies the secret key of the client application. 
+    /// Specifies the secret key of the client application.
     /// </summary>
     /// <example>
     /// Y2lzY29zeXN0ZW1zOmMxc2Nv
@@ -44,7 +44,7 @@ public class Connection
     public string ClientSecret { get; set; }
 
     /// <summary>
-    /// Specifies the username of the user. 
+    /// Specifies the username of the user.
     /// </summary>
     /// <example>
     /// johndoe@example.com
@@ -64,7 +64,7 @@ public class Connection
     public string Password { get; set; }
 
     /// <summary>
-    /// Specifies the app ID for fetching an access token. 
+    /// Specifies the app ID for fetching an access token.
     /// This is the unique identifier for your application.
     /// </summary>
     /// <example>
@@ -73,7 +73,7 @@ public class Connection
     public string ClientId { get; set; }
 
     /// <summary>
-    /// Specifies the tenant ID for fetching an access token. 
+    /// Specifies the tenant ID for fetching an access token.
     /// This is the unique identifier of your Azure AD tenant.
     /// </summary>
     /// <example>

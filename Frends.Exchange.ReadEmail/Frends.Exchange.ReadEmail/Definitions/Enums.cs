@@ -18,7 +18,7 @@ public enum AuthenticationProviders
     /// <summary>
     /// Select this if the authentication should be done using a username and password. This requires the username and password of the user.
     /// </summary>
-    UsernamePassword
+    UsernamePassword,
 }
 
 /// <summary>
@@ -30,16 +30,19 @@ public enum FileExistHandlers
     /// Skip the file creation.
     /// </summary>
     Skip,
+
     /// <summary>
     /// Rename the file by appending a unique number.
     /// </summary>
     Rename,
+
     /// <summary>
     /// Append to the existing file.
     /// </summary>
     Append,
+
     /// <summary>
     /// Overwrite the existing file.
     /// </summary>
-    OverWrite
+    OverWrite,
 }

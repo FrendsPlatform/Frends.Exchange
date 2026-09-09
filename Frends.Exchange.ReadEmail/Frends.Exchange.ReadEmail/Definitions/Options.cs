@@ -16,8 +16,8 @@ public class Options
     public bool DeleteReadEmails { get; set; } = false;
 
     /// <summary>
-    /// Gets or sets a value indicating whether an error should stop the task and throw an exception.
-    /// If set to true, an exception will be thrown when an error occurs. If set to false, Task will try to continue and the error will be added into Result.Error and Result.Success will be set to false.
+    /// Gets or sets a value indicating whether an error should throw an exception or return a failed Result.
+    /// If set to true, an exception will be thrown when an error occurs. If set to false, execution will stop immediately and return a Result with Success set to false and error details.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
