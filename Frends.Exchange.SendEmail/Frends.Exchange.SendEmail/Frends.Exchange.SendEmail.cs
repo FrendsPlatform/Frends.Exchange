@@ -1,9 +1,4 @@
-﻿using Azure.Identity;
-using Frends.Exchange.SendEmail.Definitions;
-using Microsoft.Graph;
-using Microsoft.Graph.Me.SendMail;
-using Microsoft.Graph.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -11,29 +6,35 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Identity;
+using Frends.Exchange.SendEmail.Definitions;
+using Frends.Exchange.SendEmail.Helpers;
+using Microsoft.Graph;
+using Microsoft.Graph.Me.SendMail;
+using Microsoft.Graph.Models;
 
 namespace Frends.Exchange.SendEmail;
 
 /// <summary>
 /// Microsoft Exchange Task.
 /// </summary>
-public class Exchange
+public static class Exchange
 {
     /// <summary>
     /// List of temp files to be deleted.
     /// </summary>
-    internal static List<string> tempFilePaths = new();
+    private static List<string> tempFilePaths = new();
 
     /// <summary>
     /// Send a Microsoft Exchange email.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Exchange.SendEmail)
     /// </summary>
-    /// <param name="connection">Parameters for establishing a connection.</param>
     /// <param name="input">Email content</param>
+    /// <param name="connection">Parameters for establishing a connection.</param>
     /// <param name="options">Options for controlling the behavior of this Task.</param>
     /// <param name="cancellationToken">Token received from Frends to cancel this Task.</param>
-    /// <returns>Object { bool Success, string Data }</returns>
-    public static async Task<Result> SendEmail([PropertyTab] Connection connection, [PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
+    /// <returns>Object { bool Success, string Data, Error Error }</returns>
+    public static async Task<Result> SendEmail([PropertyTab] Input input, [PropertyTab] Connection connection, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         InputCheck(connection, input);
         return await SendExchangeEmail(input, connection, options, cancellationToken);
@@ -84,7 +85,7 @@ public class Exchange
 
     private static List<Recipient> GetRecipients(string to)
     {
-        return to.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(receiver => new Recipient { EmailAddress = new EmailAddress { Address = receiver.Replace(" ", "") } }).ToList();
+        return to.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(receiver => new Recipient { EmailAddress = new EmailAddress { Address = receiver.Replace(" ", string.Empty) } }).ToList();
     }
 
     private static Importance GetImportance(ImportanceLevels importance)
@@ -113,8 +114,10 @@ public class Exchange
         try
         {
             foreach (var file in tempFilePaths)
+            {
                 if (File.Exists(file))
                     File.Delete(file);
+            }
         }
         catch (Exception)
         {
@@ -150,9 +153,10 @@ public class Exchange
                             fileList.Add(file);
                         }
                     }
-                    else
-                        if (options.ThrowExceptionIfAttachmentNotFound)
+                    else if (options.ThrowExceptionIfAttachmentNotFound)
+                    {
                         throw new Exception($"No files found in directory {attachment.FilePath}.");
+                    }
 
                     break;
                 case AttachmentTypes.AttachmentFromString:
@@ -169,7 +173,7 @@ public class Exchange
         // Upload (large) or prepare attachment (small)
         if (containLargeFile)
         {
-            //Create draft message
+            // Create draft message
             message = string.IsNullOrWhiteSpace(from)
                         ? await client.Me.Messages.PostAsync(message, cancellationToken: cancellationToken)
                         : await client.Users[from].Messages.PostAsync(message, cancellationToken: cancellationToken);
@@ -190,7 +194,7 @@ public class Exchange
                             AttachmentType = AttachmentType.File,
                             Name = fileName,
                             Size = fileStream.Length,
-                            ContentType = "application/octet-stream"
+                            ContentType = "application/octet-stream",
                         },
                     };
                     uploadSession = await client.Me.Messages[message.Id].Attachments.CreateUploadSession.PostAsync(uploadRequestBody, cancellationToken: cancellationToken);
@@ -204,7 +208,7 @@ public class Exchange
                             AttachmentType = AttachmentType.File,
                             Name = fileName,
                             Size = fileStream.Length,
-                            ContentType = "application/octet-stream"
+                            ContentType = "application/octet-stream",
                         },
                     };
                     uploadSession = await client.Users[from].Messages[message.Id].Attachments.CreateUploadSession.PostAsync(uploadRequestBody, cancellationToken: cancellationToken);
@@ -231,6 +235,7 @@ public class Exchange
                     AdditionalData = new Dictionary<string, object> { { "contentBytes", Convert.ToBase64String(littleStream) } },
                 });
             }
+
             message.Attachments = attachmentList;
         }
 
@@ -267,7 +272,9 @@ public class Exchange
                     await client.Me.SendMail.PostAsync(requestBody, cancellationToken: cancellationToken);
                 }
                 else
+                {
                     await client.Me.Messages[message.Id].Send.PostAsync(cancellationToken: cancellationToken);
+                }
             }
             else
             {
@@ -277,7 +284,9 @@ public class Exchange
                     await client.Users[input.From].SendMail.PostAsync(userRequestBody, cancellationToken: cancellationToken);
                 }
                 else
+                {
                     await client.Users[input.From].Messages[message.Id].Send.PostAsync(cancellationToken: cancellationToken);
+                }
             }
 
             CleanUpTempFiles();
@@ -286,10 +295,7 @@ public class Exchange
         }
         catch (Exception ex)
         {
-            if (options.ThrowExceptionOnFailure)
-                throw;
-
-            return new Result(false, $"Failed to send an email. {ex.Message}");
+            return ex.Handle(options);
         }
     }
 }
