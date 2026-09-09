@@ -21,7 +21,7 @@ public class Result
     public bool Success { get; private set; }
 
     /// <summary>
-    /// Gets the result of the task. Contains exception message if exception was thrown and Options.ThrowErrorOnFailure = false.
+    /// Gets the data returned by the task.
     /// </summary>
     /// <example>{ "AAMkADIxYTJiZDIz", "C:\temp\file.txt", 6000, "#microsoft.graph.fileAttachment", "This is content." }</example>
     public List<ResultObject> Data { get; private set; }
