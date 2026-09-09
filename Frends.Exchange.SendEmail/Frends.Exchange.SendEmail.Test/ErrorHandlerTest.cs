@@ -18,10 +18,10 @@ public class ErrorHandlerTest
     {
         _connection = new Connection()
         {
-            Username = Environment.GetEnvironmentVariable("Exchange_User"),
-            Password = Environment.GetEnvironmentVariable("Exchange_User_Password"),
-            ClientId = Environment.GetEnvironmentVariable("Exchange_Application_ID"),
-            TenantId = Environment.GetEnvironmentVariable("Exchange_Tenant_ID"),
+            Username = "test",
+            Password = "test",
+            ClientId = "test",
+            TenantId = "test",
             AuthenticationProvider = AuthenticationProviders.UsernamePassword,
             ClientSecret = null,
             X509CertificateFilePath = null,
@@ -29,8 +29,8 @@ public class ErrorHandlerTest
 
         _input = new Input()
         {
-            From = Environment.GetEnvironmentVariable("Exchange_User"),
-            To = Environment.GetEnvironmentVariable("Exchange_User"),
+            From = "test",
+            To = "test",
             Subject = "This is subject",
             Message = "This is message",
             Attachments = new[]
