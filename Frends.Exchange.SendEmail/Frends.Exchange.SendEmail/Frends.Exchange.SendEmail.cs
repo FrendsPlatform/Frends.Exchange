@@ -153,11 +153,10 @@ public static class Exchange
                             fileList.Add(file);
                         }
                     }
-                    else
-                        if (options.ThrowExceptionIfAttachmentNotFound)
-                        {
-                            throw new Exception($"No files found in directory {attachment.FilePath}.");
-                        }
+                    else if (options.ThrowExceptionIfAttachmentNotFound)
+                    {
+                        throw new Exception($"No files found in directory {attachment.FilePath}.");
+                    }
 
                     break;
                 case AttachmentTypes.AttachmentFromString:
