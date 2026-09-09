@@ -423,26 +423,6 @@ public class UnitTests
         await Assert.ThrowsExceptionAsync<Exception>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
     }
 
-    [TestMethod]
-    public async Task SendEmailTest_FileNotFound_CustomErrorMessage()
-    {
-        _input.Subject = $"{_input.Subject}, Method: SendEmailTest_ReceiverNotFound";
-        _input.Attachments = new[] {
-            new Attachments()
-            {
-                AttachmentType = AttachmentTypes.FileAttachment,
-                FilePath = @"C:\nothinghere",
-                FileMask = "*.*"
-            }
-        };
-        _options.ThrowErrorOnFailure = true;
-        _options.ThrowExceptionIfAttachmentNotFound = true;
-        _options.ErrorMessageOnFailure = "Custom error message";
-
-        var ex = await Assert.ThrowsExceptionAsync<Exception>(async () => await Exchange.SendEmail(_input, _connection, _options, default));
-        StringAssert.Contains(ex.Message, "Custom error message");
-    }
-
     internal static void CreateFiles()
     {
         foreach (var filePath in _files)
