@@ -1,4 +1,6 @@
-﻿namespace Frends.Exchange.ReadEmail.Definitions;
+﻿using System;
+
+namespace Frends.Exchange.ReadEmail.Definitions;
 
 /// <summary>
 /// Represents an error that occurred during the task execution.
@@ -15,5 +17,5 @@ public class Error
     /// Additional information about the error, such as the original exception.
     /// </summary>
     /// <example>System.ArgumentNullException: Value cannot be null.</example>
-    public dynamic AdditionalInfo { get; set; }
+    public Exception AdditionalInfo { get; set; }
 }
