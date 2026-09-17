@@ -29,7 +29,7 @@ internal static class ErrorHandler
 
     private static void ThrowIfCanceled(Exception exception, bool throwCanceled = true)
     {
-        if (throwCanceled && exception is OperationCanceledException) throw exception;
+        if (throwCanceled && exception is OperationCanceledException) ExceptionDispatchInfo.Capture(exception).Throw();
     }
 
     private static void ThrowBaseException(Exception exception, string customMessage = null)

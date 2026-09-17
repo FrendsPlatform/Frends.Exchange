@@ -1,4 +1,6 @@
-﻿namespace Frends.Exchange.SendEmail.Definitions;
+﻿using System;
+
+namespace Frends.Exchange.SendEmail.Definitions;
 
 /// <summary>
 /// Represents error details of a failed task execution.
@@ -15,5 +17,5 @@ public class Error
     /// Gets or sets additional information about the error, such as the original exception.
     /// </summary>
     /// <example>System.Exception: Object reference not set to an instance of an object.</example>
-    public object AdditionalInfo { get; set; }
+    public Exception AdditionalInfo { get; set; }
 }

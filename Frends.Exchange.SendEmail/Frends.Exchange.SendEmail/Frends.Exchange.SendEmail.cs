@@ -36,7 +36,6 @@ public static class Exchange
     /// <returns>Object { bool Success, string Data, Error Error }</returns>
     public static async Task<Result> SendEmail([PropertyTab] Input input, [PropertyTab] Connection connection, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        InputCheck(connection, input);
         return await SendExchangeEmail(input, connection, options, cancellationToken);
     }
 
@@ -246,6 +245,7 @@ public static class Exchange
     {
         try
         {
+            InputCheck(connection, input);
             using var client = CreateGraphServiceClient(connection);
             var message = new Message
             {

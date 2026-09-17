@@ -13,48 +13,10 @@ public class ErrorHandlerTest
     private static Input _input = new();
     private static Options _options = new();
 
-    [TestInitialize]
-    public void Setup()
-    {
-        _connection = new Connection()
-        {
-            Username = "test",
-            Password = "test",
-            ClientId = "test",
-            TenantId = "test",
-            AuthenticationProvider = AuthenticationProviders.UsernamePassword,
-            ClientSecret = null,
-            X509CertificateFilePath = null,
-        };
-
-        _input = new Input()
-        {
-            From = "test",
-            To = "test",
-            Subject = "This is subject",
-            Message = "This is message",
-            Attachments = new[]
-            {
-                new Attachments()
-                {
-                    AttachmentType = AttachmentTypes.FileAttachment,
-                    FilePath = @"C:\nothinghere",
-                    FileMask = "*.*",
-                },
-            },
-        };
-
-        _options = new Options()
-        {
-            ThrowErrorOnFailure = true,
-            ThrowExceptionIfAttachmentNotFound = true,
-        };
-    }
-
     [TestMethod]
     public async Task Should_Throw_Error_When_ThrowErrorOnFailure_Is_True()
     {
-        var ex = await Assert.ThrowsExceptionAsync<Exception>(async () =>
+        var ex = await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
             await Exchange.SendEmail(_input, _connection, _options, default));
         Assert.IsNotNull(ex);
     }
