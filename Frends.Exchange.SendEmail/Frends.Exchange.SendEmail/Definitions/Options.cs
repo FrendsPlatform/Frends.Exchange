@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Exchange.SendEmail.Definitions;
 
@@ -11,11 +12,19 @@ public class Options
     /// Gets or sets a value indicating whether an error should stop the task and throw an exception.
     /// </summary>
     /// <remarks>
-    /// If set to true, an exception will be thrown when an error occurs. If set to false, the error message will be inserted into Result.Data and Result.Success will be set to false.
+    /// If set to true, an exception will be thrown when an error occurs. If set to false, the error message will be inserted into Result.Error and Result.Success will be set to false.
     /// </remarks>
     /// <example>true</example>
     [DefaultValue(true)]
-    public bool ThrowExceptionOnFailure { get; set; }
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message on failure. If ThrowErrorOnFailure is set to true, then the original exception will be wrapped in a new Exception with this error message.
+    /// </summary>
+    /// <example>Failed to send email to recipient.</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets a value indicating whether an exception should be thrown if no files match the given path.
