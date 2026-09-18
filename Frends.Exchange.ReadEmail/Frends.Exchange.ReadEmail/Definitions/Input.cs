@@ -9,7 +9,7 @@ namespace Frends.Exchange.ReadEmail.Definitions;
 public class Input
 {
     /// <summary>
-    /// User entity to get emails from. Can be left empty to use default user. 
+    /// User entity to get emails from. Can be left empty to use default user.
     /// </summary>
     /// <example>johndoe@example.com</example>
     public string From { get; set; }
@@ -82,7 +82,7 @@ public class Input
     /// <summary>
     /// Create directory where the downloaded attachments will be stored.
     /// </summary>
-    /// <example></example>
+    /// <example>true</example>
     [UIHint(nameof(DownloadAttachments), "", true)]
     public bool CreateDirectory { get; set; }
 

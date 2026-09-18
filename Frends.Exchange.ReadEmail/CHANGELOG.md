@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.0] - 2026-09-04
+### Changed
+- Upgraded the Task to target .NET 8.
+- Removed MimeKit library.
+- **Breaking:** Renamed `Options.ThrowExceptionOnFailure` to `Options.ThrowErrorOnFailure`.
+- **Breaking:** Replaced `Result.ErrorMessages` with a single `Result.Error` object containing the error `Message` and `AdditionalInfo`.
+### Added
+- Added `Options.ErrorMessageOnFailure` to allow overriding the error message shown when the Task fails.
+
 ## [1.5.0] - 2026-05-07
 ### Added
 - Added `Mailbox` parameter to `Connection` to allow reading emails from a mailbox different than the authenticated user. 

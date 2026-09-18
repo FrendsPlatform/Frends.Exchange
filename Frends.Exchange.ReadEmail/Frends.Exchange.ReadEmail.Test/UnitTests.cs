@@ -59,7 +59,7 @@ public class UnitTests
 
         _options = new Options()
         {
-            ThrowExceptionOnFailure = true,
+            ThrowErrorOnFailure = true,
         };
 
         await SeedMailbox(3);
@@ -79,20 +79,20 @@ public class UnitTests
     public async Task ReadEmailTest_ReadAndDownload_AllFolders()
     {
         _input.Filter = null;
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
     }
 
     [TestMethod]
     public async Task ReadEmailTest_ReadAndDownload_Inbox()
     {
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
     }
 
@@ -100,10 +100,10 @@ public class UnitTests
     public async Task ReadEmailTest_Read_DONTDownload_Inbox()
     {
         _input.DownloadAttachments = false;
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsFalse(Directory.Exists(_input.DestinationDirectory));
     }
 
@@ -111,10 +111,10 @@ public class UnitTests
     public async Task ReadEmailTest_ReadAndDownload_Select_Inbox()
     {
         _input.Select = "subject";
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
     }
 
@@ -122,10 +122,10 @@ public class UnitTests
     public async Task ReadEmailTest_ReadAndDownload_FROM_Inbox()
     {
         _input.From = _user;
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
     }
 
@@ -133,10 +133,10 @@ public class UnitTests
     public async Task ReadEmailTest_ReadAndDownload_MarkAsRead_Inbox()
     {
         _input.UpdateReadStatus = true;
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
     }
 
@@ -144,10 +144,10 @@ public class UnitTests
     public async Task ReadEmailTest_ReadAndDownload_Skip_Inbox()
     {
         _input.Skip = 2;
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
     }
 
@@ -155,10 +155,10 @@ public class UnitTests
     public async Task ReadEmailTest_ReadAndDownload_Top_Inbox()
     {
         _input.Top = 2;
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(2, result.Data.Count);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
     }
 
@@ -166,10 +166,10 @@ public class UnitTests
     public async Task ReadEmailTest_ReadAndDownload_OrderBy_Inbox()
     {
         _input.Orderby = "receivedDateTime DESC,subject ASC";
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
     }
 
@@ -177,10 +177,10 @@ public class UnitTests
     public async Task ReadEmailTest_ReadAndDownload_Expand_Inbox()
     {
         _input.Expand = "attachments";
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
     }
 
@@ -188,28 +188,28 @@ public class UnitTests
     public async Task ReadEmailTest_ReadAndDownload_Header_Inbox()
     {
         _input.Headers = new[] { new HeaderParameters() { HeaderName = "Prefer", HeaderValues = new[] { "outlook.body-content-type=\"text\"" } } };
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
     }
 
     [TestMethod]
     public async Task ReadEmailTest_ReadAndDownload_FileExistHandler_Skip()
     {
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
         var fileCount = Directory.GetFiles(_downloadDir).Length;
 
         _input.FileExistHandler = FileExistHandlers.Skip;
-        var resultSkip = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var resultSkip = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(resultSkip.Success);
         Assert.IsTrue(resultSkip.Data.Count > 0);
-        Assert.AreEqual(0, resultSkip.ErrorMessages.Count);
+        Assert.IsNull(resultSkip.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
         Assert.AreEqual(fileCount, Directory.GetFiles(_downloadDir).Length);
     }
@@ -217,18 +217,18 @@ public class UnitTests
     [TestMethod]
     public async Task ReadEmailTest_ReadAndDownload_FileExistHandler_Rename()
     {
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
         var fileCount = Directory.GetFiles(_downloadDir).Length;
 
         _input.FileExistHandler = FileExistHandlers.Rename;
-        var resultSkip = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var resultSkip = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(resultSkip.Success);
         Assert.IsTrue(resultSkip.Data.Count > 0);
-        Assert.AreEqual(0, resultSkip.ErrorMessages.Count);
+        Assert.IsNull(resultSkip.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
         Assert.AreEqual(fileCount + fileCount, Directory.GetFiles(_downloadDir).Length);
     }
@@ -236,18 +236,18 @@ public class UnitTests
     [TestMethod]
     public async Task ReadEmailTest_ReadAndDownload_FileExistHandler_OverWrite()
     {
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
         var fileCount = Directory.GetFiles(_downloadDir).Length;
 
         _input.FileExistHandler = FileExistHandlers.OverWrite;
-        var resultSkip = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var resultSkip = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(resultSkip.Success);
         Assert.IsTrue(resultSkip.Data.Count > 0);
-        Assert.AreEqual(0, resultSkip.ErrorMessages.Count);
+        Assert.IsNull(resultSkip.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
         Assert.AreEqual(fileCount, Directory.GetFiles(_downloadDir).Length);
     }
@@ -255,18 +255,18 @@ public class UnitTests
     [TestMethod]
     public async Task ReadEmailTest_ReadAndDownload_FileExistHandler_Append()
     {
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
         var fileCount = Directory.GetFiles(_downloadDir).Length;
 
         _input.FileExistHandler = FileExistHandlers.Append;
-        var resultSkip = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var resultSkip = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(resultSkip.Success);
         Assert.IsTrue(resultSkip.Data.Count > 0);
-        Assert.AreEqual(0, resultSkip.ErrorMessages.Count);
+        Assert.IsNull(resultSkip.Error);
         Assert.IsTrue(Directory.Exists(_input.DestinationDirectory));
         Assert.AreEqual(fileCount, Directory.GetFiles(_downloadDir).Length);
     }
@@ -275,7 +275,7 @@ public class UnitTests
     public async Task ReadEmailTest_TryToDownload_NoDir()
     {
         _input.CreateDirectory = false;
-        await Assert.ThrowsExceptionAsync<Exception>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<Exception>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
     }
 
     [TestMethod]
@@ -284,19 +284,19 @@ public class UnitTests
         _connection.AuthenticationProvider = AuthenticationProviders.UsernamePassword;
 
         _connection.TenantId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
 
         _connection.TenantId = _tenantID;
         _connection.ClientId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
 
         _connection.ClientId = _applicationID;
         _connection.Username = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
 
         _connection.Username = _user;
         _connection.Password = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
     }
 
     [TestMethod]
@@ -306,15 +306,15 @@ public class UnitTests
 
         _connection.X509CertificateFilePath = "Something";
         _connection.TenantId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
 
         _connection.TenantId = _tenantID;
         _connection.ClientId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
 
         _connection.ClientId = _applicationID;
         _connection.X509CertificateFilePath = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
     }
 
     [TestMethod]
@@ -324,15 +324,15 @@ public class UnitTests
 
         _connection.ClientSecret = "Something";
         _connection.TenantId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
 
         _connection.TenantId = _tenantID;
         _connection.ClientId = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
 
         _connection.ClientId = _applicationID;
         _connection.ClientSecret = null;
-        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_connection, _input, _options, default));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await Exchange.ReadEmail(_input, _connection, _options, default));
     }
 
     [TestMethod]
@@ -346,14 +346,14 @@ public class UnitTests
         _input.Filter = $"parentFolderId eq 'INBOX' and subject eq '{testSubject}'";
         _options.DeleteReadEmails = true;
 
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.Data.Count, "Should have found exactly one test email");
         Assert.AreEqual(testSubject, result.Data[0].Subject);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
 
         _options.DeleteReadEmails = false;
-        var secondRead = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var secondRead = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.AreEqual(0, secondRead.Data.Count, "Test email should have been deleted");
     }
 
@@ -362,13 +362,13 @@ public class UnitTests
     {
         // Force a failure by providing an invalid TenantId
         _connection.TenantId = "invalid-guid";
-        _options.ThrowExceptionOnFailure = false;
+        _options.ThrowErrorOnFailure = false;
 
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
 
         // This checks the 'else' branch in your catch block
         Assert.IsFalse(result.Success);
-        Assert.IsTrue(result.ErrorMessages.Count > 0);
+        Assert.IsNotNull(result.Error);
         Assert.AreEqual(0, result.Data.Count);
     }
 
@@ -377,10 +377,10 @@ public class UnitTests
     {
         _connection.Mailbox = _user;
         _input.From = null;
-        var result = await Exchange.ReadEmail(_connection, _input, _options, default);
+        var result = await Exchange.ReadEmail(_input, _connection, _options, default);
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data.Count > 0);
-        Assert.AreEqual(0, result.ErrorMessages.Count);
+        Assert.IsNull(result.Error);
         Assert.IsTrue(result.Data.All(x => x.Mailbox == _user));
     }
 
